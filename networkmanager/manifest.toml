@@ -1,0 +1,35 @@
+# manifest.toml - networkmanager (syshub tier)
+
+[package]
+name             = "networkmanager"
+version          = "1.56.1"
+description      = "Network management daemon - backend for nm-applet, handles wired/wireless/mobile connections"
+license          = "GPL-2.0-or-later"
+maintainer       = "Ali Zain <alizain@zainiumdynamics.tech>"
+homepage         = "https://networkmanager.dev"
+build_type       = "dynamic"
+libc_target      = "musl"
+
+blake3           = ""
+ed25519_sig      = ""
+ed25519_pubkey   = ""
+
+depends          = ["glib", "dbus", "libgudev", "polkit", "quantra-logind"]
+provides         = ["networkmanager", "libnm.so", "nmcli"]
+tags             = ["network", "dbus", "daemon"]
+
+[install]
+bin     = "/overlayer/syshub/bin"
+sbin    = "/overlayer/syshub/sbin"
+lib     = "/overlayer/syshub/lib"
+libexec = "/overlayer/syshub/libexec"
+share   = "/overlayer/syshub/share"
+etc     = "/overlayer/syshub/etc"
+_syshub = true
+
+[remove]
+files    = []
+dirs     = []
+symlinks = []
+
+[hooks]
