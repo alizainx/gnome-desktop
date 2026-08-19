@@ -1,0 +1,49 @@
+maintainer="Ali Zain <alizain@zainiumdynamics.tech>"
+pkgname=gnome-settings-daemon
+pkgver=49.1
+pkgrel=0
+# Already has proper elogind support upstream (meson_use elogind), no
+# patch needed. -Dsystemd=false -Delogind=true, libelogind satisfied by
+# qlogind's pkgconfig alias.
+source="https://download.gnome.org/sources/gnome-settings-daemon/49/gnome-settings-daemon-$pkgver.tar.xz"
+sha256sums="2a9957fc4f91c3b9127b49484179bef485120d9c1c208e44d44e6a746e6cc1c1  gnome-settings-daemon-$pkgver.tar.xz"
+# Cross-checked against Alpine's own real gnome-settings-daemon
+# APKBUILD depends_dev/makedepends, trimmed to what our -D... flags
+# below actually still enable (colord/cups/networkmanager/x11/
+# xwayland/wwan/smartcard all disabled, so their -dev deps are
+# dropped here too).
+makedepends="glib-dev gnome-desktop-dev gsettings-desktop-schemas-dev gtk+3.0-dev alsa-lib-dev elogind-dev geoclue-dev geocode-glib-dev libcanberra-dev libgweather4-dev libnotify-dev pango-dev polkit-dev pulseaudio-dev upower-dev libgudev-dev wayland-dev fontconfig-dev"
+
+# Heavy optional deps disabled for this first pass (colord, cups,
+# networkmanager, modemmanager, smartcard, X11, xwayland) since none
+# of those have recipes yet either. Even with everything disabled,
+# still not published: geocode-glib, libgweather, libcanberra, geoclue,
+# libpulse, polkit, upower, libgudev, wayland, alsa-lib, fontconfig,
+# libnotify. Will not configure until those exist.
+build() {
+    meson setup builddir \
+        --prefix=/overlayer/syshub \
+        --libdir=/overlayer/syshub/lib \
+        --includedir=/overlayer/syshub/include \
+        -Dsystemd=false \
+        -Delogind=true \
+        -Dalsa=true \
+        -Dgudev=true \
+        -Dgcr3=false \
+        -Dcolord=false \
+        -Dcups=false \
+        -Dnetwork_manager=false \
+        -Drfkill=true \
+        -Dsmartcard=false \
+        -Dx11=false \
+        -Dxwayland=false \
+        -Dwwan=false
+    ninja -C builddir
+    DESTDIR="$(pwd)/_zexbuild-install" ninja -C builddir install
+}
+
+package() {
+    local inst="_zexbuild-install/overlayer/syshub"
+    mkdir -p "$PAYLOAD_DIR"
+    cp -a "$inst"/. "$PAYLOAD_DIR"/
+}
