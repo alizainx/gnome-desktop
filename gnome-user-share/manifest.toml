@@ -1,0 +1,31 @@
+# manifest.toml - gnome-user-share (syshub tier)
+
+[package]
+name             = "gnome-user-share"
+version          = "47.2"
+description      = "Personal file sharing for the GNOME desktop over WebDAV"
+license          = "GPL-2.0-only"
+maintainer       = "Ali Zain <alizain@zainiumdynamics.tech>"
+homepage         = "https://gitlab.gnome.org/GNOME/gnome-user-share"
+build_type       = "dynamic"
+libc_target      = "musl"
+
+blake3           = ""
+ed25519_sig      = ""
+ed25519_pubkey   = ""
+
+depends          = ["glib", "libselinux", "mod_dnssd", "apache2"]
+provides         = ["gnome-user-share"]
+tags             = ["gnome", "sharing", "webdav"]
+
+[install]
+lib     = "/overlayer/syshub/lib"
+share   = "/overlayer/syshub/share"
+_syshub = true
+
+[remove]
+files    = []
+dirs     = []
+symlinks = []
+
+[hooks]
