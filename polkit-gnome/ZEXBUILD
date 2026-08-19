@@ -23,6 +23,16 @@ sha256sums="1784494963b8bf9a00eedc6cd3a2868fb123b8a5e516e66c5eda48df17ab9369  po
 makedepends="glib-dev gtk+3.0-dev intltool polkit-dev"
 
 build() {
+    # 0.105 is from 2011 - its bundled config.sub predates "zainium"
+    # as a vendor entirely and hard-rejects --host="$CHOST":
+    # "config.sub: x86_64-zainium-linux-musl failed". Every other
+    # autotools recipe here ships a config.sub new enough to accept
+    # an arbitrary vendor field; this one doesn't. Replace it with a
+    # trivial passthrough - we already know our own triple is valid,
+    # config.sub's actual validation isn't needed here.
+    printf '#!/bin/sh\necho "$1"\n' > config.sub
+    chmod +x config.sub
+
     ./configure \
         --host="$CHOST" \
         --prefix=/overlayer/syshub \
