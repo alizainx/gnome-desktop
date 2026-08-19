@@ -1,0 +1,31 @@
+# manifest.toml - nm-applet (syshub tier)
+
+[package]
+name             = "nm-applet"
+version          = "1.36.0"
+description      = "NetworkManager connection editor and status-bar applet"
+license          = "GPL-2.0-or-later"
+maintainer       = "Ali Zain <alizain@zainiumdynamics.tech>"
+homepage         = "https://wiki.gnome.org/Projects/NetworkManager"
+build_type       = "dynamic"
+libc_target      = "musl"
+
+blake3           = ""
+ed25519_sig      = ""
+ed25519_pubkey   = ""
+
+depends          = ["glib", "gcr", "jansson", "libayatana-appindicator", "libdbusmenu-gtk3", "libgudev", "libnotify", "libsecret", "libnma", "gtk3", "modemmanager", "networkmanager", "polkit", "freedesktop-icon-theme"]
+provides         = ["nm-applet"]
+tags             = ["gnome", "network", "applet"]
+
+[install]
+bin     = "/overlayer/syshub/bin"
+share   = "/overlayer/syshub/share"
+_syshub = true
+
+[remove]
+files    = []
+dirs     = []
+symlinks = []
+
+[hooks]
