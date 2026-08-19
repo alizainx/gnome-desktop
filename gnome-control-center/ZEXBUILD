@@ -22,7 +22,7 @@ pkgrel=0
 # unconditional hard build dependency, not optional - depends= below
 # reflects that.
 source="https://download.gnome.org/sources/gnome-control-center/49/gnome-control-center-$pkgver.tar.xz"
-sha256sums="a6080394334a7b2ba3ab6702e9f26dd5a5e75c1fda1d14e36c8e06764d6413fc  gnome-control-center-$pkgver.tar.xz"
+sha256sums="097936443f2d1380db7ea30749a1f870be00dcc90c909788ae243887c83ad8bb  gnome-control-center-$pkgver.tar.xz"
 makedepends="glib-dev gtk4.0-dev libadwaita-dev accountsservice-dev colord-dev gdk-pixbuf-dev gnome-desktop-dev gsettings-desktop-schemas-dev libxml2-dev upower-dev libgudev-dev gcr4-dev libpwquality-dev polkit-dev cairo-dev fontconfig-dev libgtop-dev udisks2-dev libsecret-dev gnutls-dev gsound-dev pango-dev networkmanager-dev libnma-dev gnome-bluetooth-dev krb5-dev libwacom-dev cups-dev samba-dev gnome-online-accounts-dev libepoxy-dev json-glib-dev pulseaudio-dev gnome-settings-daemon-dev tecla-dev modemmanager-dev gettext blueprint-compiler"
 
 # Deps this recipe assumes, none published yet: glib, gtk4, libadwaita,
