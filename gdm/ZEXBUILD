@@ -32,7 +32,7 @@ makedepends="itstool glib-dev libgudev-dev dconf-dev dbus-dev gtk+3.0-dev libcan
 # Alpine's own gdm makedepends, is for their older 48.0; no itstool/
 # merge_file call anywhere in 49.4's meson.build tree - not needed.)
 build() {
-    export LD_LIBRARY_PATH=/overlayer/syshub/lib:/overlayer/syshub/lib64:${LD_LIBRARY_PATH:-}
+    export LD_LIBRARY_PATH="/usr/lib:/lib:/overlayer/syshub/lib:/overlayer/syshub/lib64"
     meson setup builddir \
         --prefix=/overlayer/syshub \
         --libdir=/overlayer/syshub/lib \
