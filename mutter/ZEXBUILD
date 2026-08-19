@@ -37,34 +37,12 @@ build() {
         --prefix=/overlayer/syshub \
         --libdir=/overlayer/syshub/lib \
         --includedir=/overlayer/syshub/include \
-        -Dopengl=true \
-        -Degl=true \
-        -Dgles2=true \
-        -Dxwayland=false \
-        -Dx11=false \
-        -Dlogind=true \
+        -Dudev=true \
         -Dnative_backend=true \
         -Dremote_desktop=false \
-        -Dlibgnome_desktop=true \
-        -Dudev=true \
-        -Dlibwacom=false \
-        -Dsound_player=false \
-        -Dstartup_notification=false \
-        -Dintrospection=false \
-        -Ddocs=false \
-        -Dcogl_tests=false \
-        -Dclutter_tests=false \
-        -Dmutter_tests=false \
-        -Dtests=disabled \
-        -Dkvm_tests=false \
-        -Dtty_tests=false \
         -Dprofiler=false \
-        -Dinstalled_tests=false \
-        -Dfonts=true \
-        -Dbash_completion=false \
         -Ddevkit=disabled \
-        -Degl_device=false \
-        -Dwayland_eglstream=false
+        -Dtests=disabled
     ninja -C builddir
     DESTDIR="$(pwd)/_zexbuild-install" ninja -C builddir install
 }
