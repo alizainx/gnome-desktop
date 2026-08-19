@@ -1,0 +1,38 @@
+maintainer="Ali Zain <alizain@zainiumdynamics.tech>"
+pkgname=gnome-shell-extension-appindicator
+pkgver=65
+pkgrel=0
+# Meson, but meson.build never declares a language ('c', 'vala', ...) -
+# confirmed by reading it directly, this extension is pure JS/data,
+# meson is only used for the install-path logic (jq reads metadata.json
+# for the extension uuid) and schema/locale compilation. No compiler
+# sanity check happens, so no cross-toolchain setup is actually needed
+# here - meson setup is called the same as every other meson recipe.
+# No systemd/elogind touchpoint.
+#
+# jq (app-misc/jq in Gentoo's BDEPEND) is a host build tool.
+source="https://github.com/ubuntu/gnome-shell-extension-appindicator/archive/v$pkgver.tar.gz"
+sha256sums="a55eb3ffc8882f7d1f974fbdce2c2f72c1e14b1bf9ba72af2a99622be022287f  v$pkgver.tar.gz"
+makedepends="glib jq"
+
+# Deps this recipe assumes, none published yet: glib, gnome-shell.
+build() {
+    meson setup builddir \
+        --prefix=/overlayer/syshub \
+        --libdir=/overlayer/syshub/lib \
+        --includedir=/overlayer/syshub/include \
+        -Dlocal_install=disabled
+    ninja -C builddir
+    DESTDIR="$(pwd)/_zexbuild-install" ninja -C builddir install
+
+    # meson's own install script runs glib-compile-schemas into the
+    # system schemas dir - drop the compiled blob same as the Gentoo
+    # ebuild does, gnome2_schemas_update recompiles it centrally later.
+    rm -f "_zexbuild-install/overlayer/syshub/share/glib-2.0/schemas/gschemas.compiled"
+}
+
+package() {
+    local inst="_zexbuild-install/overlayer/syshub"
+    mkdir -p "$PAYLOAD_DIR"
+    cp -a "$inst"/. "$PAYLOAD_DIR"/
+}

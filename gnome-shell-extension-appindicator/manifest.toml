@@ -1,0 +1,30 @@
+# manifest.toml - gnome-shell-extension-appindicator (syshub tier)
+
+[package]
+name             = "gnome-shell-extension-appindicator"
+version          = "65"
+description      = "Support legacy tray icons, AppIndicators and StatusNotifierItems in GNOME Shell"
+license          = "GPL-2.0-only"
+maintainer       = "Ali Zain <alizain@zainiumdynamics.tech>"
+homepage         = "https://github.com/ubuntu/gnome-shell-extension-appindicator"
+build_type       = "dynamic"
+libc_target      = "musl"
+
+blake3           = ""
+ed25519_sig      = ""
+ed25519_pubkey   = ""
+
+depends          = ["glib", "gnome-shell"]
+provides         = ["gnome-shell-extension-appindicator"]
+tags             = ["gnome", "shell", "extension"]
+
+[install]
+share   = "/overlayer/syshub/share"
+_syshub = true
+
+[remove]
+files    = []
+dirs     = []
+symlinks = []
+
+[hooks]
