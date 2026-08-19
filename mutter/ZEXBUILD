@@ -57,7 +57,7 @@ build() {
         -Dcogl_tests=false \
         -Dclutter_tests=false \
         -Dmutter_tests=false \
-        -Dtests=false \
+        -Dtests=disabled \
         -Dkvm_tests=false \
         -Dtty_tests=false \
         -Dprofiler=false \
