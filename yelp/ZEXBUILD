@@ -1,0 +1,27 @@
+maintainer="Ali Zain <alizain@zainiumdynamics.tech>"
+pkgname=yelp
+pkgver=49.1
+pkgrel=0
+# Meson, C. No systemd/elogind touchpoint - the GNOME help browser.
+source="https://download.gnome.org/sources/yelp/49/yelp-$pkgver.tar.xz"
+sha256sums="3e3e94ef2d2c9487cc51062e3afbfa1578cebd29d80c84357b6d7ee6dcfd8a74  yelp-$pkgver.tar.xz"
+# yelp-xsl is this repo's own package, not an apk stand-in - not
+# listed here. libgcrypt-dev added to match Alpine's real aports
+# recipe (community/yelp) - was missing from the earlier draft.
+makedepends="bzip2-dev glib-dev gtk4.0-dev libadwaita-dev libgcrypt-dev libxml2-dev libxslt-dev sqlite-dev webkit2gtk-6.0-dev xz-dev"
+
+build() {
+    meson setup builddir \
+        --prefix=/overlayer/syshub \
+        --libdir=/overlayer/syshub/lib \
+        --includedir=/overlayer/syshub/include \
+        -Dlzma=enabled \
+        -Dbzip2=enabled
+    ninja -C builddir
+    DESTDIR="$(pwd)/_zexbuild-install" ninja -C builddir install
+}
+
+package() {
+    local inst="_zexbuild-install/overlayer/syshub"
+    cp -a "$inst"/. "$PAYLOAD_DIR"/
+}

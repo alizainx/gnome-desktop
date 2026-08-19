@@ -1,0 +1,31 @@
+# manifest.toml - yelp (syshub tier)
+
+[package]
+name             = "yelp"
+version          = "49.1"
+description      = "Help browser for GNOME"
+license          = "GPL-2.0-or-later"
+maintainer       = "Ali Zain <alizain@zainiumdynamics.tech>"
+homepage         = "https://apps.gnome.org/Yelp/"
+build_type       = "dynamic"
+libc_target      = "musl"
+
+blake3           = ""
+ed25519_sig      = ""
+ed25519_pubkey   = ""
+
+depends          = ["glib", "gtk4", "libadwaita", "libgcrypt", "libxml2", "libxslt", "sqlite", "webkitgtk6", "yelp-xsl", "xz-utils", "bzip2"]
+provides         = ["yelp"]
+tags             = ["gnome", "help", "app"]
+
+[install]
+bin     = "/overlayer/syshub/bin"
+share   = "/overlayer/syshub/share"
+_syshub = true
+
+[remove]
+files    = []
+dirs     = []
+symlinks = []
+
+[hooks]
