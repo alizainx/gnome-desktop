@@ -1,0 +1,31 @@
+# manifest.toml - gnome-desktop (syshub tier)
+
+[package]
+name             = "gnome-desktop"
+version          = "44.5"
+description      = "GNOME desktop library (libgnome-desktop-4)"
+license          = "LGPL-2.1-or-later"
+maintainer       = "Ali Zain <alizain@zainiumdynamics.tech>"
+homepage         = "https://gitlab.gnome.org/GNOME/gnome-desktop"
+build_type       = "dynamic"
+libc_target      = "musl"
+
+blake3           = ""
+ed25519_sig      = ""
+ed25519_pubkey   = ""
+
+depends          = ["glib", "gtk4", "gsettings-desktop-schemas", "gdk-pixbuf", "cairo"]
+provides         = ["libgnome-desktop-4.so"]
+tags             = ["gnome", "desktop", "library"]
+
+[install]
+lib     = "/overlayer/syshub/lib"
+share   = "/overlayer/syshub/share"
+_syshub = true
+
+[remove]
+files    = []
+dirs     = []
+symlinks = []
+
+[hooks]
