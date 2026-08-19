@@ -40,7 +40,6 @@ build() {
         -Dopengl=true \
         -Degl=true \
         -Dgles2=true \
-        -Dwayland=true \
         -Dxwayland=false \
         -Dx11=false \
         -Dlogind=true \
