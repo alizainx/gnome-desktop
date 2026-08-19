@@ -31,6 +31,8 @@ makedepends="glib-dev gtk4.0-dev pango-dev cairo-dev pixman-dev py3-argcomplete 
 # separate X11-app-compat layer inside a Wayland session, not
 # mutter-as-X-server, and no Xwayland recipe exists yet either.
 build() {
+    export LD_LIBRARY_PATH="/usr/lib:/lib:/overlayer/syshub/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
+
     meson setup builddir \
         --prefix=/overlayer/syshub \
         --libdir=/overlayer/syshub/lib \
