@@ -34,20 +34,20 @@ makedepends="
     startup-notification-dev
 "
 
-# -Dintrospection=false: St's GIR needs g-ir-scanner to run a freshly
-# linked dumper binary against mutter-dev's own libmutter-clutter/cogl
-# .so's from apk. Those fail to relocate in the CI container (musl
-# ldso: "symbol not found" for glib/pango/cairo/graphene/atk/lcms2/
-# EGL) - LD_LIBRARY_PATH pointing at /overlayer/syshub/lib first makes
-# it worse, since that's build-time stand-ins, not what mutter-dev
-# was actually linked against. Same class of problem our own mutter
-# recipe already sidesteps with -Dintrospection=false. Matching that
-# here until CI has a real Zainium-built mutter to link St against
-# instead of Alpine's mutter-dev.
+# No -Dintrospection option in 50.x (meson.options dropped it, St's
+# GIR is unconditional) - can't skip the g-ir-scanner dumper step.
+#
+# St-18 (the dumper binary) links against mutter-dev's own
+# libmutter-clutter/cogl .so's from apk and is executed during the
+# build. It was relocating against /overlayer/syshub/lib's own
+# glib/pango/cairo/graphene/atk/lcms2/EGL first (musl ldso: "symbol
+# not found") because LD_LIBRARY_PATH put that dir ahead of the
+# system path - those are build-time stand-ins for a different target,
+# not what mutter-dev was actually linked against. Dropped that
+# override so the dumper resolves against Alpine's own real libs.
 build() {
     patch -p1 < ../0001-shell-elogind-support-to-avoid-stubbed-sd_notify.patch
 
-    export LD_LIBRARY_PATH="/overlayer/syshub/lib:${LD_LIBRARY_PATH:-}"
     export PKG_CONFIG_PATH="/overlayer/syshub/lib/pkgconfig:/overlayer/syshub/share/pkgconfig:${PKG_CONFIG_PATH:-}"
     export GI_TYPELIB_PATH="/overlayer/syshub/lib/girepository-1.0:/overlayer/syshub/share/girepository-1.0:${GI_TYPELIB_PATH:-}"
     export XDG_DATA_DIRS="/overlayer/syshub/share:${XDG_DATA_DIRS:-/usr/share}"
@@ -64,8 +64,7 @@ build() {
         -Dman=false \
         -Dtests=false \
         -Dnetworkmanager=false \
-        -Dportal_helper=false \
-        -Dintrospection=false
+        -Dportal_helper=false
 
     ninja -C builddir
 
