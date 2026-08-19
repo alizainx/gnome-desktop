@@ -1,0 +1,26 @@
+maintainer="Ali Zain <alizain@zainiumdynamics.tech>"
+pkgname=libgtop
+pkgver=2.41.3
+pkgrel=0
+# Autotools (gnome2 eclass upstream), a /proc-reading system stats
+# library - no systemd/elogind dependency anywhere. No patch needed.
+source="https://download.gnome.org/sources/libgtop/2.41/libgtop-$pkgver.tar.xz"
+sha256sums="775676df958e2ea2452f7568f28b2ea581063d312773dd5c0b7624c1b9b2da8c  libgtop-$pkgver.tar.xz"
+makedepends="glib-dev intltool linux-headers gobject-introspection-dev libxau-dev libx11-dev"
+
+# Introspection off, same reasoning as every other recipe here.
+build() {
+    ./configure \
+        --host="$CHOST" \
+        --prefix=/overlayer/syshub \
+        --libdir=/overlayer/syshub/lib \
+        --disable-static \
+        --disable-introspection
+    make
+    make DESTDIR="$(pwd)/_zexbuild-install" install
+}
+
+package() {
+    local inst="_zexbuild-install/overlayer/syshub"
+    cp -a "$inst"/. "$PAYLOAD_DIR"/
+}

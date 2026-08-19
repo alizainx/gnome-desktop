@@ -1,0 +1,31 @@
+# manifest.toml - libgtop (syshub tier)
+
+[package]
+name             = "libgtop"
+version          = "2.41.3"
+description      = "Library that provides top-like system statistics to applications"
+license          = "GPL-2.0-or-later"
+maintainer       = "Ali Zain <alizain@zainiumdynamics.tech>"
+homepage         = "https://gitlab.gnome.org/GNOME/libgtop"
+build_type       = "dynamic"
+libc_target      = "musl"
+
+blake3           = ""
+ed25519_sig      = ""
+ed25519_pubkey   = ""
+
+depends          = ["glib"]
+provides         = ["libgtop-2.0.so"]
+tags             = ["gnome", "system", "library"]
+
+[install]
+lib     = "/overlayer/syshub/lib"
+share   = "/overlayer/syshub/share"
+_syshub = true
+
+[remove]
+files    = []
+dirs     = []
+symlinks = []
+
+[hooks]
