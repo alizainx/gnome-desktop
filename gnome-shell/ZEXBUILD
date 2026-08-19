@@ -70,4 +70,20 @@ package() {
 
     mkdir -p "$PAYLOAD_DIR"
     cp -a "$inst"/. "$PAYLOAD_DIR"/
+
+    # ZainiumOS has no /usr hierarchy.
+    # GNOME Shell installs D-Bus service files with Alpine/FHS
+    # /usr/bin/gjs references; rewrite them to the ZainiumOS path.
+    find "$PAYLOAD_DIR/share/dbus-1/services" \
+        -type f -name '*.service' \
+        -exec sed -i \
+        's#Exec=/usr/bin/gjs#Exec=/overlayer/syshub/bin/gjs#g' \
+        {} +
+
+    # Verify that no forbidden /usr references remain in payload text.
+    if grep -RIl '/usr/' "$PAYLOAD_DIR" 2>/dev/null | head -1 | grep -q .; then
+        echo "ERROR: forbidden /usr reference remains in payload"
+        grep -RIn '/usr/' "$PAYLOAD_DIR" 2>/dev/null || true
+        return 1
+    fi
 }
