@@ -60,7 +60,6 @@ build() {
         -Dprivileged_group=wheel \
         -Dsnap=false \
         -Dtests=false \
-        -Dx11=false \
         -Dmalcontent=false
     ninja -C builddir
     DESTDIR="$(pwd)/_zexbuild-install" ninja -C builddir install
