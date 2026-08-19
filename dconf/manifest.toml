@@ -1,0 +1,33 @@
+# manifest.toml - dconf (syshub tier)
+
+[package]
+name             = "dconf"
+version          = "0.49.0"
+description      = "Simple low-level configuration system"
+license          = "LGPL-2.1-or-later"
+maintainer       = "Ali Zain <alizain@zainiumdynamics.tech>"
+homepage         = "https://wiki.gnome.org/Projects/dconf"
+build_type       = "dynamic"
+libc_target      = "musl"
+
+blake3           = ""
+ed25519_sig      = ""
+ed25519_pubkey   = ""
+
+depends          = ["glib", "dbus"]
+provides         = ["dconf", "libdconf-1.so"]
+tags             = ["gnome", "config", "gsettings"]
+
+[install]
+bin     = "/overlayer/syshub/bin"
+lib     = "/overlayer/syshub/lib"
+libexec = "/overlayer/syshub/libexec"
+share   = "/overlayer/syshub/share"
+_syshub = true
+
+[remove]
+files    = []
+dirs     = []
+symlinks = []
+
+[hooks]

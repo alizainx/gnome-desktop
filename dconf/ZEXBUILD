@@ -1,0 +1,38 @@
+maintainer="Ali Zain <alizain@zainiumdynamics.tech>"
+pkgname=dconf
+pkgver=0.49.0
+pkgrel=0
+# No systemd/elogind dependency at all. The only systemd-adjacent bit
+# is -Dsystemduserunitdir, and meson.build's own fallback is safe with
+# it unset: it tries dependency('systemd', required: false) and, if
+# not found (we ship no libsystemd.pc), just falls back to a hardcoded
+# $prefix/lib/systemd/user path string - never errors, the unit file
+# just lands somewhere nothing will ever read it. Confirmed by reading
+# the real meson.build, not guessed. No patch needed either way.
+source="https://download.gnome.org/sources/dconf/0.49/dconf-$pkgver.tar.xz"
+sha256sums="16a47e49a58156dbb96578e1708325299e4c19eea9be128d5bd12fd0963d6c36  dconf-$pkgver.tar.xz"
+makedepends="glib-dev dbus-dev"
+
+build() {
+    meson setup builddir \
+        --prefix=/overlayer/syshub \
+        --libdir=/overlayer/syshub/lib \
+        --includedir=/overlayer/syshub/include \
+        -Dbash_completion=false \
+        -Dman=false \
+        -Dgtk_doc=false \
+        -Dvapi=false
+    ninja -C builddir
+    DESTDIR="$(pwd)/_zexbuild-install" ninja -C builddir install
+}
+
+package() {
+    local inst="_zexbuild-install/overlayer/syshub"
+    mkdir -p "$PAYLOAD_DIR/bin" "$PAYLOAD_DIR/lib" "$PAYLOAD_DIR/libexec" "$PAYLOAD_DIR/share"
+    cp -a "$inst"/bin/. "$PAYLOAD_DIR/bin/" 2>/dev/null || true
+    cp -a "$inst"/lib/. "$PAYLOAD_DIR/lib/" 2>/dev/null || true
+    rm -rf "$PAYLOAD_DIR/lib/pkgconfig"
+    find "$PAYLOAD_DIR/lib" -maxdepth 1 \( -name '*.a' -o -name '*.la' \) -delete
+    cp -a "$inst"/libexec/. "$PAYLOAD_DIR/libexec/" 2>/dev/null || true
+    cp -a "$inst"/share/. "$PAYLOAD_DIR/share/" 2>/dev/null || true
+}
