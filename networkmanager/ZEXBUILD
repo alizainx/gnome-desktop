@@ -51,6 +51,7 @@ build() {
         -Dtests=no \
         -Dudev_dir=/overlayer/syshub/lib/udev \
         -Dvapi=true \
+        -Dnmtui=false \
         -Dsession_tracking=elogind \
         -Dsuspend_resume=elogind
     ninja -C builddir
