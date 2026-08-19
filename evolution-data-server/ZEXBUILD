@@ -7,49 +7,34 @@ pkgrel=0
 # anywhere in this package at all - bucket A, no patch needed.
 source="https://download.gnome.org/sources/evolution-data-server/3.60/evolution-data-server-$pkgver.tar.xz"
 sha256sums="2084dbdac396371b365d504c1ff45866ba8dca2f1252e5da1d3d9c33abdc1286  evolution-data-server-$pkgver.tar.xz"
-# CMakeLists.txt's FindSMIME-adjacent ICU check (line ~381) is a hard
-# pkg_check_modules(ICU icu-i18n icu-uc) with FATAL_ERROR if not found -
-# unconditional, no option gates it. Alpine's real APKBUILD carries
-# icu-dev in makedepends for exactly this; we were missing it.
-makedepends="bison boost-dev cmake flex glib-dev gnome-online-accounts-dev gnu-libiconv-dev gobject-introspection-dev gperf gtk+3.0-dev gtk4.0-dev icu-dev intltool json-glib-dev krb5-dev libcanberra-dev libgweather4-dev libical-dev libphonenumber-dev libsecret-dev libsoup3-dev libxml2-dev nspr-dev nss-dev openldap-dev samurai sqlite-dev vala webkit2gtk-6.0-dev zlib-dev"
+# makedepends and build() flags matched against Alpine's real aports
+# recipe (community/evolution-data-server) - was missing gcr-dev.
+# Alpine only forces 8 flags and leaves everything else (krb5, ldap,
+# gtk3/4, weather, canberra, vala, tests) on CMake's own auto-detection
+# against whatever -dev packages are present, rather than force-OFF -
+# matched that here instead of disabling features we do have deps for.
+makedepends="bison boost-dev cmake flex gcr-dev glib-dev gnome-online-accounts-dev gnu-libiconv-dev gobject-introspection-dev gperf gtk+3.0-dev gtk4.0-dev icu-dev intltool json-glib-dev krb5-dev libcanberra-dev libgweather4-dev libical-dev libphonenumber-dev libsecret-dev libsoup3-dev libxml2-dev nspr-dev nss-dev openldap-dev samurai sqlite-dev vala webkit2gtk-6.0-dev zlib-dev"
 
-# Deps this recipe assumes, none published yet: libsecret, sqlite,
-# glib, libical, libxml2, nspr, nss, libsoup3, json-glib, icu, zlib.
-# gtk/oauth/kerberos/ldap/goa/weather/vala/canberra all off for this
-# first pass - none of those deps are published either.
-# evolution-data-server will not configure until the core set exists.
-#
 # WITH_SYSTEMDUSERUNITDIR defaults to installing unit files under
 # $prefix/lib/systemd/user (CMakeLists.txt line ~250) unless explicitly
-# set to "no". No service manager on this system reads that path, so
-# disable it rather than ship dead unit files.
+# set to "no". Alpine doesn't set this either (no systemd.pc on their
+# system, so it auto-skips) but we set it explicitly anyway - harmless,
+# and clearer than relying on the same absence-of-systemd.pc detection.
 build() {
     cmake -S . -B builddir \
         -DCMAKE_INSTALL_PREFIX=/overlayer/syshub \
         -DCMAKE_INSTALL_LIBDIR=/overlayer/syshub/lib \
         -DCMAKE_INSTALL_INCLUDEDIR=/overlayer/syshub/include \
         -DSYSCONF_INSTALL_DIR=/overlayer/syshub/etc \
+        -DCMAKE_BUILD_TYPE=None \
         -DWITH_SYSTEMDUSERUNITDIR=no \
-        -DENABLE_GTK_DOC=OFF \
-        -DENABLE_SCHEMAS_COMPILE=OFF \
-        -DENABLE_INTROSPECTION=OFF \
-        -DWITH_KRB5=OFF \
-        -DWITH_OPENLDAP=OFF \
-        -DWITH_PHONENUMBER=OFF \
-        -DENABLE_SMIME=ON \
-        -DENABLE_GTK=OFF \
-        -DENABLE_GTK4=OFF \
-        -DENABLE_OAUTH2_WEBKITGTK=OFF \
-        -DENABLE_OAUTH2_WEBKITGTK4=OFF \
-        -DENABLE_EXAMPLES=OFF \
-        -DENABLE_GOA=OFF \
+        -DENABLE_GOA=ON \
+        -DENABLE_INTROSPECTION=ON \
+        -DENABLE_VALA_BINDINGS=ON \
+        -DWITH_PHONENUMBER=ON \
         -DWITH_LIBDB=OFF \
-        -DENABLE_IPV6=ON \
-        -DENABLE_WEATHER=OFF \
-        -DENABLE_LARGEFILE=ON \
-        -DENABLE_VALA_BINDINGS=OFF \
-        -DENABLE_TESTS=OFF \
-        -DENABLE_CANBERRA=OFF
+        -DENABLE_SCHEMAS_COMPILE:BOOL=OFF \
+        -DENABLE_OAUTH2_WEBKITGTK=OFF
     cmake --build builddir
     DESTDIR="$(pwd)/_zexbuild-install" cmake --install builddir
 }
