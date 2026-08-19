@@ -1,0 +1,39 @@
+maintainer="Ali Zain <alizain@zainiumdynamics.tech>"
+pkgname=gnome-characters
+pkgver=49.1
+pkgrel=0
+# Meson, GJS (JS app, no C to cross-compile beyond a small helper -
+# confirmed by reading meson.build, project() declares no compiled
+# language, this is a GJS/data package like appindicator). No
+# systemd/elogind touchpoint.
+source="https://download.gnome.org/sources/gnome-characters/49/gnome-characters-$pkgver.tar.xz"
+sha256sums="795c0fe434e602dc783391fb5830dbc7d8e1ea05ca77210fb140e2f6f40a145c  gnome-characters-$pkgver.tar.xz"
+# makedepends matched against Alpine's real aports recipe
+# (community/gnome-characters) - was missing gjs-dev,
+# gobject-introspection-dev, desktop-file-utils.
+makedepends="glib-dev gtk4.0-dev libadwaita-dev gdk-pixbuf-dev pango-dev gnome-desktop-dev gjs-dev gobject-introspection-dev desktop-file-utils"
+
+# Deps this recipe assumes, none published yet: gjs, glib, gtk4,
+# libadwaita, gdk-pixbuf, pango, gnome-desktop.
+# Gc-1.0's g-ir-scanner dumper carries Zainium's own interpreter/rpath
+# like every other build product and needs to actually run against
+# real glib during the build - same fix as gnome-shell/gnome-desktop's
+# St-18/GnomeDesktop-4.0 dumpers.
+build() {
+    export LD_LIBRARY_PATH="/usr/lib:/lib:${LD_LIBRARY_PATH:-}"
+
+    meson setup builddir \
+        --prefix=/overlayer/syshub \
+        --libdir=/overlayer/syshub/lib \
+        --includedir=/overlayer/syshub/include \
+        --strip
+    ninja -C builddir
+    DESTDIR="$(pwd)/_zexbuild-install" ninja -C builddir install
+}
+
+package() {
+    local inst="_zexbuild-install/overlayer/syshub"
+    mkdir -p "$PAYLOAD_DIR/bin" "$PAYLOAD_DIR/share"
+    cp -a "$inst"/bin/. "$PAYLOAD_DIR/bin/" 2>/dev/null || true
+    cp -a "$inst"/share/. "$PAYLOAD_DIR/share/" 2>/dev/null || true
+}

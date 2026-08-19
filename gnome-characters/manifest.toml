@@ -1,0 +1,31 @@
+# manifest.toml - gnome-characters (syshub tier)
+
+[package]
+name             = "gnome-characters"
+version          = "49.1"
+description      = "Unicode character map viewer application for GNOME"
+license          = "GPL-2.0-or-later"
+maintainer       = "Ali Zain <alizain@zainiumdynamics.tech>"
+homepage         = "https://apps.gnome.org/Characters/"
+build_type       = "dynamic"
+libc_target      = "musl"
+
+blake3           = ""
+ed25519_sig      = ""
+ed25519_pubkey   = ""
+
+depends          = ["gjs", "glib", "gtk4", "libadwaita", "gdk-pixbuf", "pango", "gnome-desktop"]
+provides         = ["gnome-characters"]
+tags             = ["gnome", "unicode", "app"]
+
+[install]
+bin     = "/overlayer/syshub/bin"
+share   = "/overlayer/syshub/share"
+_syshub = true
+
+[remove]
+files    = []
+dirs     = []
+symlinks = []
+
+[hooks]
