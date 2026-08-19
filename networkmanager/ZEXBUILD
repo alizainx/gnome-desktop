@@ -47,6 +47,7 @@ build() {
         -Dqt=false \
         -Dselinux=false \
         -Dsystemd_journal=false \
+        -Dsystemdsystemunitdir=no \
         -Dtests=no \
         -Dudev_dir=/overlayer/syshub/lib/udev \
         -Dvapi=true \
