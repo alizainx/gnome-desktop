@@ -1,0 +1,51 @@
+maintainer="Ali Zain <alizain@zainiumdynamics.tech>"
+pkgname=gnome-online-accounts
+pkgver=3.56.5
+pkgrel=0
+# No systemd/elogind dependency at all, confirmed against the real
+# meson_options.txt and meson.build - no logind/systemd option or
+# dependency() call anywhere. No patch needed.
+#
+# makedepends matched against Alpine's real aports recipe
+# (community/gnome-online-accounts) - krb5-dev and gcr4-dev are real
+# apk packages same as every other -dev here, so kerberos is enabled
+# below instead of disabled (earlier draft assumed neither was
+# available, which isn't the constraint - apk provides them same as
+# any other makedepend). Also added gnome-desktop-dev and
+# webkit2gtk-4.1-dev (the interactive OAuth sign-in flow embeds
+# webkit). Doc/test-only entries (docbook-xml, docbook-xsl, gi-docgen,
+# gtk-doc, itstool, libxml2-utils, libxslt, meson) dropped, same as
+# introspection/vala staying off below.
+source="https://download.gnome.org/sources/gnome-online-accounts/3.56/gnome-online-accounts-$pkgver.tar.xz"
+sha256sums="23e03dcfa03950b60e9f892f7b729ee31deeb827c655df8f78b8bca5bc197734  gnome-online-accounts-$pkgver.tar.xz"
+makedepends="dbus-dev gcr4-dev glib-dev gnome-desktop-dev gtk4.0-dev json-glib-dev keyutils-dev krb5-dev libadwaita-dev libsecret-dev libsoup3-dev libxml2-dev rest1-dev webkit2gtk-4.1-dev"
+
+# introspection/vala/man/documentation all off, same reasoning as
+# every other recipe here.
+build() {
+    meson setup builddir \
+        --prefix=/overlayer/syshub \
+        --libdir=/overlayer/syshub/lib \
+        --includedir=/overlayer/syshub/include \
+        -Dgoabackend=true \
+        -Dexchange=true \
+        -Dfedora=false \
+        -Dgoogle=true \
+        -Dimap_smtp=true \
+        -Dkerberos=true \
+        -Downcloud=true \
+        -Dwebdav=true \
+        -Ddocumentation=false \
+        -Dms_graph=true \
+        -Dintrospection=false \
+        -Dman=false \
+        -Dvapi=false
+    ninja -C builddir
+    DESTDIR="$(pwd)/_zexbuild-install" ninja -C builddir install
+}
+
+package() {
+    local inst="_zexbuild-install/overlayer/syshub"
+    mkdir -p "$PAYLOAD_DIR"
+    cp -a "$inst"/. "$PAYLOAD_DIR"/
+}

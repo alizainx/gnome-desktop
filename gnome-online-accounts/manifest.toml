@@ -1,0 +1,33 @@
+# manifest.toml - gnome-online-accounts (syshub tier)
+
+[package]
+name             = "gnome-online-accounts"
+version          = "3.56.5"
+description      = "GNOME framework for accessing online accounts"
+license          = "LGPL-2.0-or-later"
+maintainer       = "Ali Zain <alizain@zainiumdynamics.tech>"
+homepage         = "https://gitlab.gnome.org/GNOME/gnome-online-accounts"
+build_type       = "dynamic"
+libc_target      = "musl"
+
+blake3           = ""
+ed25519_sig      = ""
+ed25519_pubkey   = ""
+
+depends          = ["glib", "dbus", "gcr4", "gnome-desktop", "krb5", "libadwaita", "gtk4", "json-glib", "libsecret", "libsoup3", "keyutils", "libxml2", "rest", "webkit2gtk"]
+provides         = ["gnome-online-accounts", "libgoa-1.0.so"]
+tags             = ["gnome", "accounts", "dbus"]
+
+[install]
+bin     = "/overlayer/syshub/bin"
+lib     = "/overlayer/syshub/lib"
+libexec = "/overlayer/syshub/libexec"
+share   = "/overlayer/syshub/share"
+_syshub = true
+
+[remove]
+files    = []
+dirs     = []
+symlinks = []
+
+[hooks]
