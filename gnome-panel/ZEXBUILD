@@ -10,7 +10,8 @@ pkgrel=0
 # configure bypasses the pkg-config check entirely - same technique
 # Gentoo's own ebuild uses, no source patch needed. Module lists
 # copied verbatim from the ebuild's src_configure().
-source="https://download.gnome.org/sources/gnome-panel/3.58/gnome-panel-$pkgver.tar.xz"
+source="https://download.gnome.org/sources/gnome-panel/3.58/gnome-panel-$pkgver.tar.xz
+0001-drop-unused-gnome-systemd-include.patch"
 sha256sums="7e8bca43a81a134c666b3a78baf2affb0c5d30efb1bca653887fc41b31dd5e64  gnome-panel-$pkgver.tar.xz"
 makedepends="itstool glib-dev gnome-desktop-dev gdk-pixbuf-dev pango-dev gtk+3.0-dev libwnck3-dev gnome-menus-dev gsettings-desktop-schemas-dev cairo-dev libgweather4-dev dconf-dev libx11-dev gdm-dev geocode-glib-dev polkit-dev"
 
@@ -21,6 +22,8 @@ makedepends="itstool glib-dev gnome-desktop-dev gdk-pixbuf-dev pango-dev gtk+3.0
 # disabled for this first pass. gnome-panel will not configure until
 # these exist.
 build() {
+    patch -p1 < ../0001-drop-unused-gnome-systemd-include.patch
+
     local action_modules="gio-unix-2.0 gtk+-3.0 libgnome-menu-3.0 libelogind x11"
     local launcher_modules="gio-unix-2.0 gtk+-3.0 libgnome-menu-3.0 libelogind"
     local menu_modules="gdm gio-unix-2.0 gtk+-3.0 libgnome-menu-3.0 libelogind"
