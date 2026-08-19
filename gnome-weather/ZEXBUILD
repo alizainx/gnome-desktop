@@ -15,7 +15,7 @@ source="https://download.gnome.org/sources/gnome-weather/50/gnome-weather-$pkgve
 sha256sums="57de7578605f91f9ab400551ce7738db7505bc88f42a33c70ce7a70167fdb513  gnome-weather-$pkgver.tar.xz"
 # Verified against Alpine's own real gnome-weather APKBUILD
 # makedepends verbatim (including typescript, the host tsc tool).
-makedepends="geoclue-dev gjs-dev glib-dev gobject-introspection-dev gtk4.0-dev libadwaita-dev libgweather4-dev typescript"
+makedepends="desktop-file-utils geoclue-dev gjs-dev glib-dev gobject-introspection-dev gtk4.0-dev libadwaita-dev libgweather4-dev typescript"
 
 # Deps this recipe assumes, none published yet: glib,
 # gobject-introspection, gtk4, gjs, geoclue, libadwaita, libgweather,
