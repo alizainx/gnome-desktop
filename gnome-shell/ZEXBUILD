@@ -1,56 +1,7 @@
-maintainer="Ali Zain <alizain@zainiumdynamics.tech>"
-
-pkgname=gnome-shell
-pkgver=50.4
-pkgrel=0
-
-source="https://download.gnome.org/sources/gnome-shell/50/gnome-shell-$pkgver.tar.xz
-0001-shell-elogind-support-to-avoid-stubbed-sd_notify.patch"
-
-sha256sums="c531939539db316a41aef23670370abd1330d3254f84bcb0f9f4dae5d6e362cf  gnome-shell-$pkgver.tar.xz"
-
-makedepends="
-    elogind-dev
-    mutter-dev
-    evolution-data-server-dev
-    gcr4-dev
-    gjs-dev
-    gnome-autoar-dev
-    gnome-desktop-dev
-    gobject-introspection-dev
-    gstreamer-dev
-    gtk4.0-dev
-    ibus-dev
-    json-glib-dev
-    libcanberra-dev
-    libxml2-dev
-    libx11-dev
-    libxext-dev
-    libxfixes-dev
-    pipewire-dev
-    polkit-dev
-    pulseaudio-dev
-    sassc
-    startup-notification-dev
-"
-
-# No -Dintrospection option in 50.x (meson.options dropped it, St's
-# GIR is unconditional) - can't skip the g-ir-scanner dumper step.
-#
-# St-18 (the dumper binary) links against mutter-dev's own
-# libmutter-clutter/cogl .so's from apk and is executed during the
-# build. It was relocating against /overlayer/syshub/lib's own
-# glib/pango/cairo/graphene/atk/lcms2/EGL first (musl ldso: "symbol
-# not found") because LD_LIBRARY_PATH put that dir ahead of the
-# system path - those are build-time stand-ins for a different target,
-# not what mutter-dev was actually linked against. Dropped that
-# override so the dumper resolves against Alpine's own real libs.
 build() {
     patch -p1 < ../0001-shell-elogind-support-to-avoid-stubbed-sd_notify.patch
 
-    export PKG_CONFIG_PATH="/overlayer/syshub/lib/pkgconfig:/overlayer/syshub/share/pkgconfig:${PKG_CONFIG_PATH:-}"
-    export GI_TYPELIB_PATH="/overlayer/syshub/lib/girepository-1.0:/overlayer/syshub/share/girepository-1.0:${GI_TYPELIB_PATH:-}"
-    export XDG_DATA_DIRS="/overlayer/syshub/share:${XDG_DATA_DIRS:-/usr/share}"
+    export LD_LIBRARY_PATH="/overlayer/syshub/lib:/usr/lib:/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
 
     meson setup builddir \
         --prefix=/overlayer/syshub \
@@ -68,13 +19,6 @@ build() {
 
     ninja -C builddir
 
-    DESTDIR="$(pwd)/_zexbuild-install" ninja -C builddir install
-}
-
-package() {
-    local inst="_zexbuild-install/overlayer/syshub"
-
-    mkdir -p "$PAYLOAD_DIR"
-
-    cp -a "$inst"/. "$PAYLOAD_DIR"/
+    DESTDIR="$(pwd)/_zexbuild-install" \
+        ninja -C builddir install
 }
