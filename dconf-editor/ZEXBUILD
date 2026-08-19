@@ -7,7 +7,7 @@ pkgrel=0
 # build flags. No patch needed.
 source="https://download.gnome.org/sources/dconf-editor/49/dconf-editor-$pkgver.tar.xz"
 sha256sums="90a8ccfadf51dff31e0028324fb9a358b2d26c5ae861a71c7dbf9f4dd9bdd399  dconf-editor-$pkgver.tar.xz"
-makedepends="dconf-dev glib-dev gtk+3.0-dev libhandy1-dev vala"
+makedepends="desktop-file-utils gtk-update-icon-cache dconf-dev glib-dev gtk+3.0-dev libhandy1-dev vala"
 
 build() {
     meson setup builddir \
