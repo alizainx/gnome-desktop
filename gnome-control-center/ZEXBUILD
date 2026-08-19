@@ -1,0 +1,76 @@
+maintainer="Ali Zain <alizain@zainiumdynamics.tech>"
+pkgname=gnome-control-center
+pkgver=50.4
+pkgrel=0
+# Checked the real gnome-control-center-49.9 tarball, not just the
+# ebuild: there is no logind/elogind/systemd option anywhere in
+# meson_options.txt or meson.build, and no dependency('libelogind' or
+# 'libsystemd') call either. Gentoo's REQUIRED_USE="^^ ( elogind
+# systemd )" only selects a *runtime* companion package (openrc-settingsd
+# vs plain systemd) via RDEPEND, it never reaches the build. So this
+# is bucket A for build purposes despite the audit flagging it as
+# bucket B - verified by reading the actual source, not guessed.
+#
+# Gentoo's src_configure() also references flags (bluetooth, cups, goa,
+# kerberos, network_manager, wacom) that do not exist in upstream
+# meson_options.txt at all - they come from a Gentoo-only external
+# patchset (dev.gentoo.org/~pacho/gnome-control-center-49.5-patchset.tar.xz)
+# that makes several panels optional. That patchset is unrelated to
+# elogind/musl, out of scope here, not carried. Without it, every one
+# of those panels' dependencies (NetworkManager+libnma, cups+samba,
+# gnome-online-accounts, mit-krb5, gnome-bluetooth, libwacom) is an
+# unconditional hard build dependency, not optional - depends= below
+# reflects that.
+source="https://download.gnome.org/sources/gnome-control-center/50/gnome-control-center-$pkgver.tar.xz"
+sha256sums="5856c73999bedf45e74f73bac3d61e2b5ec1689f8bcf1943737baeee8204fb11  gnome-control-center-$pkgver.tar.xz"
+makedepends="glib-dev gtk4.0-dev libadwaita-dev accountsservice-dev colord-dev colord-gtk-dev gdk-pixbuf-dev gnome-desktop-dev gsettings-desktop-schemas-dev libxml2-dev upower-dev libgudev-dev gcr4-dev libpwquality-dev polkit-dev cairo-dev fontconfig-dev libgtop-dev udisks2-dev libsecret-dev gnutls-dev gsound-dev pango-dev networkmanager-dev libnma-dev gnome-bluetooth-dev krb5-dev libwacom-dev cups-dev samba-dev gnome-online-accounts-dev libepoxy-dev json-glib-dev pulseaudio-dev gnome-settings-daemon-dev tecla-dev modemmanager-dev gettext blueprint-compiler"
+# Deps this recipe assumes, none published yet: glib, gtk4, libadwaita,
+# accountsservice, colord, gdk-pixbuf, gnome-desktop, gsettings-desktop-schemas,
+# libxml2, upower, libgudev, gcr, libpwquality, polkit, cairo,
+# fontconfig, libgtop, udisks, libsecret, gnutls, gsound, pango, plus the
+# whole unconditional panel dependency set noted above (NetworkManager,
+# gnome-bluetooth, mit-krb5, libwacom, cups, samba, ibus,
+# gnome-online-accounts). Will not configure until all of these exist.
+#
+# Re-audited meson.build's actual dependency() calls directly (not just
+# Gentoo's ebuild): epoxy, json-glib-1.0, libpulse(-mainloop-glib),
+# gnome-settings-daemon (>=48.rc, fallback: subproject "gsd" which the
+# release tarball doesn't bundle), mm-glib (Linux-only, no option gate)
+# and tecla (>=47.0, required:false but falls back to subproject()
+# which also isn't bundled in the tarball) are all real unconditional
+# build deps that were missing - libepoxy-dev/json-glib-dev/
+# pulseaudio-dev/gnome-settings-daemon-dev/modemmanager-dev/tecla-dev
+# added (gnome-settings-daemon-dev and tecla-dev are Alpine's own
+# same-named builds, used purely as build-time stand-ins same as
+# gtk4.0-dev elsewhere in this repo). blueprint-compiler (find_program,
+# required) and gettext (po/meson.build's unconditional i18n.gettext())
+# were also missing. colord-gtk, dropped from the earlier version of
+# this comment, isn't actually referenced by 49.9's meson.build at all
+# - was never a real dependency.
+build() {
+    meson setup builddir \
+        --prefix=/overlayer/syshub \
+        --libdir=/overlayer/syshub/lib \
+        --includedir=/overlayer/syshub/include \
+        -Ddeprecated-declarations=disabled \
+        -Ddocumentation=false \
+        -Dlocation-services=disabled \
+        -Dibus=false \
+        -Dprivileged_group=wheel \
+        -Dsnap=false \
+        -Dtests=false \
+        -Dmalcontent=false
+    ninja -C builddir
+    DESTDIR="$(pwd)/_zexbuild-install" ninja -C builddir install
+}
+
+package() {
+    local inst="_zexbuild-install/overlayer/syshub"
+    mkdir -p "$PAYLOAD_DIR/bin" "$PAYLOAD_DIR/lib" "$PAYLOAD_DIR/libexec" "$PAYLOAD_DIR/share"
+    cp -a "$inst"/bin/. "$PAYLOAD_DIR/bin/" 2>/dev/null || true
+    cp -a "$inst"/lib/. "$PAYLOAD_DIR/lib/" 2>/dev/null || true
+    rm -rf "$PAYLOAD_DIR/lib/pkgconfig"
+    find "$PAYLOAD_DIR/lib" -maxdepth 1 \( -name '*.a' -o -name '*.la' \) -delete
+    cp -a "$inst"/libexec/. "$PAYLOAD_DIR/libexec/" 2>/dev/null || true
+    cp -a "$inst"/share/. "$PAYLOAD_DIR/share/" 2>/dev/null || true
+}
