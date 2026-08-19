@@ -1,0 +1,31 @@
+# manifest.toml - gnome-menus (syshub tier)
+
+[package]
+name             = "gnome-menus"
+version          = "3.38.1"
+description      = "Library and layout configuration for the Desktop Menu fd.o specification"
+license          = "GPL-2.0-or-later"
+maintainer       = "Ali Zain <alizain@zainiumdynamics.tech>"
+homepage         = "https://gitlab.gnome.org/GNOME/gnome-menus"
+build_type       = "dynamic"
+libc_target      = "musl"
+
+blake3           = ""
+ed25519_sig      = ""
+ed25519_pubkey   = ""
+
+depends          = ["glib"]
+provides         = ["libgnome-menu-3.so"]
+tags             = ["gnome", "menu", "library"]
+
+[install]
+lib     = "/overlayer/syshub/lib"
+share   = "/overlayer/syshub/share"
+_syshub = true
+
+[remove]
+files    = []
+dirs     = []
+symlinks = []
+
+[hooks]
