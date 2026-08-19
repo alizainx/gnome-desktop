@@ -47,7 +47,6 @@ build() {
         -Drun-dir=/run/gdm \
         -Dselinux=disabled \
         -Dsystemd-journal=false \
-        -Duser-display-server=true \
         -Dx11-support=true \
         -Dxdmcp=disabled \
         -Dinitial-vt=7 \
