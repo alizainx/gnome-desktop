@@ -8,7 +8,7 @@ pkgrel=0
 # it's a missing BDEPEND, not a flag to toggle off.
 source="https://download.gnome.org/sources/gnome-color-manager/3.36/gnome-color-manager-$pkgver.tar.xz"
 sha256sums="3904d42abb4ea566df0b880e82bf0b9f86386c692f15b318469a4c7be33a887f  gnome-color-manager-$pkgver.tar.xz"
-makedepends="glib-dev gtk+3.0-dev colord-dev lcms2-dev"
+makedepends="glib-dev gtk+3.0-dev colord-dev lcms2-dev itstool"
 
 # Deps this recipe assumes, none published yet: glib, gtk3, colord,
 # lcms2.
