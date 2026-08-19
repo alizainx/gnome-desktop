@@ -1,6 +1,6 @@
 maintainer="Ali Zain <alizain@zainiumdynamics.tech>"
 pkgname=gnome-shell
-pkgver=49.9
+pkgver=50.4
 pkgrel=0
 # 0001-shell-elogind-support-to-avoid-stubbed-sd_notify.patch: real
 # upstream-style patch (Swagtoy, carried by Gentoo's gnome-shell
@@ -14,7 +14,7 @@ pkgrel=0
 # resolve.
 source="https://download.gnome.org/sources/gnome-shell/49/gnome-shell-$pkgver.tar.xz
 0001-shell-elogind-support-to-avoid-stubbed-sd_notify.patch"
-sha256sums="a9e60f1235d1f34c4e25fd70702f544ecdd2c164d9d18123787a3b96f9b984b8  gnome-shell-$pkgver.tar.xz"
+sha256sums="c531939539db316a41aef23670370abd1330d3254f84bcb0f9f4dae5d6e362cf  gnome-shell-$pkgver.tar.xz"
 # Cross-checked against Alpine's own real gnome-shell APKBUILD
 # makedepends, trimmed of networkmanager-dev/libnma-dev (we build with
 # -Dnetworkmanager=false) and gnome-bluetooth/gnome-control-center/
@@ -28,7 +28,7 @@ sha256sums="a9e60f1235d1f34c4e25fd70702f544ecdd2c164d9d18123787a3b96f9b984b8  gn
 # or have_x11: dependency('x11'); dependency('xext'); dependency('xfixes')`.
 # Our mutter recipe builds with -Dx11=true, so this branch is always
 # taken here even though it's undeclared in our own -D... flags below.
-makedepends="elogind-dev evolution-data-server-dev gcr4-dev gjs-dev gnome-autoar-dev gnome-desktop-dev gobject-introspection-dev gstreamer-dev gtk4.0-dev ibus-dev json-glib-dev libcanberra-dev libxml2-dev libx11-dev libxext-dev libxfixes-dev mutter-dev pipewire-dev polkit-dev pulseaudio-dev sassc startup-notification-dev"
+makedepends="elogind-dev mutter-dev evolution-data-server-dev gcr4-dev gjs-dev gnome-autoar-dev gnome-desktop-dev gobject-introspection-dev gstreamer-dev gtk4.0-dev ibus-dev json-glib-dev libcanberra-dev libxml2-dev libx11-dev libxext-dev libxfixes-dev mutter-dev pipewire-dev polkit-dev pulseaudio-dev sassc startup-notification-dev"
 
 # Not published yet: mutter, gjs, gtk4, gnome-desktop, gnome-autoar,
 # json-glib, ibus, pipewire, networkmanager. Will not configure until
