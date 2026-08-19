@@ -1,0 +1,31 @@
+# manifest.toml - nautilus-sendto (syshub tier)
+
+[package]
+name             = "nautilus-sendto"
+version          = "3.8.6"
+description      = "Nautilus extension for sending files to external locations"
+license          = "GPL-2.0-or-later"
+maintainer       = "Ali Zain <alizain@zainiumdynamics.tech>"
+homepage         = "https://gitlab.gnome.org/Archive/nautilus-sendto"
+build_type       = "dynamic"
+libc_target      = "musl"
+
+blake3           = ""
+ed25519_sig      = ""
+ed25519_pubkey   = ""
+
+depends          = ["glib", "nautilus"]
+provides         = ["nautilus-sendto"]
+tags             = ["gnome", "nautilus", "sharing"]
+
+[install]
+bin     = "/overlayer/syshub/bin"
+share   = "/overlayer/syshub/share"
+_syshub = true
+
+[remove]
+files    = []
+dirs     = []
+symlinks = []
+
+[hooks]

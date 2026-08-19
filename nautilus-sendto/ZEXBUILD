@@ -1,0 +1,29 @@
+maintainer="Ali Zain <alizain@zainiumdynamics.tech>"
+pkgname=nautilus-sendto
+pkgver=3.8.6
+pkgrel=0
+# Meson, C. No systemd/elogind touchpoint. Carries one patch, same
+# one Gentoo carries: src/meson.build calls i18n.merge_file() with a
+# positional 'appdata' argument, a form meson removed support for in
+# 0.61 - any current meson on this CI image needs this fixed.
+source="https://download.gnome.org/sources/nautilus-sendto/3.8/nautilus-sendto-$pkgver.tar.xz
+0001-meson-0.61.patch"
+sha256sums="164d7c6e8bae29c4579bcc67a7bf50d783662b1545b62f3008e7ea3c0410e04d  nautilus-sendto-$pkgver.tar.xz"
+# nautilus itself is the runtime host app, not a build-time link dep.
+makedepends="glib-dev"
+
+build() {
+    patch -p1 < ../0001-meson-0.61.patch
+
+    meson setup builddir \
+        --prefix=/overlayer/syshub \
+        --libdir=/overlayer/syshub/lib \
+        --includedir=/overlayer/syshub/include
+    ninja -C builddir
+    DESTDIR="$(pwd)/_zexbuild-install" ninja -C builddir install
+}
+
+package() {
+    local inst="_zexbuild-install/overlayer/syshub"
+    cp -a "$inst"/. "$PAYLOAD_DIR"/
+}
