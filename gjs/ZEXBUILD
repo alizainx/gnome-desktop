@@ -1,0 +1,51 @@
+maintainer="Ali Zain <alizain@zainiumdynamics.tech>"
+pkgname=gjs
+pkgver=1.88.1
+pkgrel=0
+# Verified against dev-libs/gjs-1.88.1.ebuild and the tarball's own
+# meson_options.txt: no systemd/elogind option exists anywhere in gjs,
+# it's a JS engine binding with no session-tracking surface at all -
+# bucket A (zero touchpoint), not one of the packages the original
+# audit named, but confirmed the same way. No patch needed.
+#
+# The one real musl-specific thing here, carried straight from the
+# ebuild's own src_configure(): on musl, gjs (or pixman, or gnome-shell)
+# needs a larger stack or librsvg fails to render a particular SVG and
+# gdm/gnome-shell come up on the fail-whale screen. Not our bug to fix -
+# see https://gitlab.gnome.org/GNOME/librsvg/-/issues/686 and .../874.
+# This is a linker flag, not a source patch.
+source="https://download.gnome.org/sources/gjs/1.88/gjs-$pkgver.tar.xz"
+sha256sums="767bab80e665d672cb00563c25f0b392a9ec8c2996ed1d4454c698b4c2f0a3d9  gjs-$pkgver.tar.xz"
+makedepends="glib-dev libffi-dev gobject-introspection-dev mozjs-dev cairo-dev"
+
+# Deps this recipe assumes, none published yet: glib, libffi,
+# gobject-introspection, spidermonkey (dev-lang/spidermonkey:140 in
+# Gentoo), cairo. gjs will not configure until these exist.
+build() {
+    export LDFLAGS="${LDFLAGS:-} -Wl,-z,stack-size=2097152"
+
+    meson setup builddir \
+        --prefix=/overlayer/syshub \
+        --libdir=/overlayer/syshub/lib \
+        --includedir=/overlayer/syshub/include \
+        -Dreadline=disabled \
+        -Dprofiler=disabled \
+        -Dinstalled_tests=false \
+        -Ddtrace=false \
+        -Dsystemtap=false \
+        -Dskip_dbus_tests=true \
+        -Dskip_gtk_tests=true \
+        -Dverbose_logs=false
+    ninja -C builddir
+    DESTDIR="$(pwd)/_zexbuild-install" ninja -C builddir install
+}
+
+package() {
+    local inst="_zexbuild-install/overlayer/syshub"
+    mkdir -p "$PAYLOAD_DIR/bin" "$PAYLOAD_DIR/lib" "$PAYLOAD_DIR/share"
+    cp -a "$inst"/bin/. "$PAYLOAD_DIR/bin/" 2>/dev/null || true
+    cp -a "$inst"/lib/. "$PAYLOAD_DIR/lib/" 2>/dev/null || true
+    rm -rf "$PAYLOAD_DIR/lib/pkgconfig"
+    find "$PAYLOAD_DIR/lib" -maxdepth 1 \( -name '*.a' -o -name '*.la' \) -delete
+    cp -a "$inst"/share/. "$PAYLOAD_DIR/share/" 2>/dev/null || true
+}
