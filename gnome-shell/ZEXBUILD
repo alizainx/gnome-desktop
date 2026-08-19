@@ -37,11 +37,13 @@ makedepends="
 build() {
     patch -p1 < ../0001-shell-elogind-support-to-avoid-stubbed-sd_notify.patch
 
-    export PKG_CONFIG_PATH="/overlayer/syshub/lib/pkgconfig:/overlayer/syshub/share/pkgconfig${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}"
+    export PKG_CONFIG_PATH="/overlayer/syshub/lib/pkgconfig:/overlayer/syshub/share/pkgconfig:${PKG_CONFIG_PATH:-}"
+    export GI_TYPELIB_PATH="/overlayer/syshub/lib/girepository-1.0:/overlayer/syshub/share/girepository-1.0:${GI_TYPELIB_PATH:-}"
+    export XDG_DATA_DIRS="/overlayer/syshub/share:${XDG_DATA_DIRS:-/usr/share}"
 
-    export GI_TYPELIB_PATH="/overlayer/syshub/lib/girepository-1.0:/overlayer/syshub/share/girepository-1.0${GI_TYPELIB_PATH:+:$GI_TYPELIB_PATH}"
-
-    export XDG_DATA_DIRS="/overlayer/syshub/share${XDG_DATA_DIRS:+:$XDG_DATA_DIRS}"
+    # Build-time introspection binaries such as St-18 must run
+    # against Alpine's build environment libraries.
+    export LD_LIBRARY_PATH="/usr/lib:/lib:${LD_LIBRARY_PATH:-}"
 
     meson setup builddir \
         --prefix=/overlayer/syshub \
