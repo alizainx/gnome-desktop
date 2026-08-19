@@ -2,7 +2,7 @@
 
 [package]
 name             = "gdm"
-version          = "49.4"
+version          = "50.2"
 description      = "GNOME Display Manager, systemd-optional build (elogind/qlogind)"
 license          = "GPL-2.0-or-later"
 maintainer       = "Ali Zain <alizain@zainiumdynamics.tech>"
