@@ -22,8 +22,6 @@ makedepends="openssh libcap-ng-dev glib-dev gcr-dev libgcrypt-dev p11-kit-dev"
 # p11-kit. Will not configure until these exist. caps (libcap-ng) and
 # selinux both off, neither is packaged.
 build() {
-    export PKG_CONFIG_PATH="/overlayer/syshub/lib/pkgconfig:/overlayer/syshub/share/pkgconfig:${PKG_CONFIG_PATH:-}"
-
     meson setup builddir \
         --prefix=/overlayer/syshub \
         --libdir=/overlayer/syshub/lib \
@@ -34,6 +32,8 @@ build() {
         -Dpam=false \
         -Dmanpage=false \
         -Ddebug-mode=false
+
+    ninja -C builddir -t targets | grep -i marshal || true
 
     ninja -C builddir
     DESTDIR="$(pwd)/_zexbuild-install" ninja -C builddir install
