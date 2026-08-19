@@ -29,8 +29,13 @@ package() {
     # gtweak/gsettings.py and gshellwrapper.py hardcode
     # GSETTINGS_SCHEMA_DIR = "/usr/share/glib-2.0/schemas/" as a
     # Python string literal - substrate's payload check rejects any
-    # /usr text reference regardless of source.
+    # /usr text reference regardless of source. Skip real ELF
+    # binaries - sed -i rewriting one as text corrupts it (byte-length
+    # shift breaks internal offsets), bit gnome-user-share's package()
+    # hit for real.
     grep -RIl '/usr/' "$PAYLOAD_DIR" 2>/dev/null | while IFS= read -r f; do
+        magic="$(od -An -tx1 -N4 "$f" 2>/dev/null | tr -d ' \n')"
+        [ "$magic" = "7f454c46" ] && continue
         sed -i 's#/usr/#/overlayer/syshub/#g' "$f"
     done
 }
