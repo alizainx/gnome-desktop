@@ -1,0 +1,40 @@
+maintainer="Ali Zain <alizain@zainiumdynamics.tech>"
+pkgname=nautilus
+pkgver=49.6
+pkgrel=0
+# No systemd/elogind dependency at all - bucket A, confirmed against
+# the real meson_options.txt (docs, extensions, introspection,
+# packagekit, selinux, cloudproviders, tests, profile - nothing
+# session-related). No patch needed.
+#
+# Gentoo's 43.0-optional-gstreamer.patch (adds a "gstreamer" meson
+# option) is a Gentoo-only patch not present upstream - not carried
+# here, out of scope. Without it, -Dextensions=true unconditionally
+# needs gstreamer/gst-plugins-base for the audio-video-properties
+# extension - listed in makedepends.
+source="https://download.gnome.org/sources/nautilus/49/nautilus-$pkgver.tar.xz"
+sha256sums="b68ab4185faa35e80d22825477d681a563a7606622eed24018b1bcbee83b26cc  nautilus-$pkgver.tar.xz"
+# gvfs is a runtime GIO backend (D-Bus daemons), not linked at build
+# time - left out here even though it's in manifest.toml's depends.
+makedepends="glib-dev gexiv2-dev gnome-autoar-dev gnome-desktop-dev gsettings-desktop-schemas-dev gtk4.0-dev wayland-dev libadwaita-dev libportal-dev icu-dev pango-dev tinysparql-dev gstreamer-dev gst-plugins-base-dev"
+
+build() {
+    meson setup builddir \
+        --prefix=/overlayer/syshub \
+        --libdir=/overlayer/syshub/lib \
+        --includedir=/overlayer/syshub/include \
+        -Ddocs=false \
+        -Dextensions=true \
+        -Dintrospection=false \
+        -Dpackagekit=false \
+        -Dselinux=false \
+        -Dcloudproviders=false \
+        -Dtests=none
+    ninja -C builddir
+    DESTDIR="$(pwd)/_zexbuild-install" ninja -C builddir install
+}
+
+package() {
+    local inst="_zexbuild-install/overlayer/syshub"
+    cp -a "$inst"/. "$PAYLOAD_DIR"/
+}
