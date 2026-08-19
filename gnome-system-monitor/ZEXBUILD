@@ -1,0 +1,36 @@
+maintainer="Ali Zain <alizain@zainiumdynamics.tech>"
+pkgname=gnome-system-monitor
+pkgver=50.0
+pkgrel=0
+
+# Bumped 49.1 -> 50.0 to match Alpine's real recipe and the rest of
+# this repo's GNOME 50 pin. Meson, C++ (glibmm/gtkmm). systemd option
+# only toggles reading systemd-journald process metadata, purely
+# optional - off, this OS has no journald.
+source="https://download.gnome.org/sources/gnome-system-monitor/50/gnome-system-monitor-$pkgver.tar.xz"
+sha256sums="a4138aa754b4584c46de91fad1d685e27b12bc2457de761863b6be02d84c4862  gnome-system-monitor-$pkgver.tar.xz"
+
+# Matches Alpine's real makedepends, minus catch2-3 (test-only, we
+# don't run meson test) plus libxml2-utils/libxslt which Alpine lists
+# separately from libxml2-dev.
+makedepends="glibmm-dev gnome-desktop-dev gtkmm4-dev itstool libadwaita-dev libgtop-dev librsvg-dev libxml2-dev libxml2-utils libxslt polkit-dev"
+
+build() {
+    # localtime_r needs _BSD_SOURCE on musl - same CFLAGS Alpine's own
+    # recipe sets.
+    export CFLAGS="${CFLAGS:-} -D_BSD_SOURCE"
+
+    meson setup builddir \
+        --prefix=/overlayer/syshub \
+        --libdir=/overlayer/syshub/lib \
+        --includedir=/overlayer/syshub/include \
+        -Dsystemd=false
+    ninja -C builddir
+    DESTDIR="$(pwd)/_zexbuild-install" ninja -C builddir install
+}
+
+package() {
+    local inst="_zexbuild-install/overlayer/syshub"
+    mkdir -p "$PAYLOAD_DIR"
+    cp -a "$inst"/. "$PAYLOAD_DIR"/
+}
