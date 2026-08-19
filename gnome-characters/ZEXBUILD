@@ -15,11 +15,18 @@ makedepends="glib-dev gtk4.0-dev libadwaita-dev gdk-pixbuf-dev pango-dev gnome-d
 
 # Deps this recipe assumes, none published yet: gjs, glib, gtk4,
 # libadwaita, gdk-pixbuf, pango, gnome-desktop.
+# Gc-1.0's g-ir-scanner dumper carries Zainium's own interpreter/rpath
+# like every other build product and needs to actually run against
+# real glib during the build - same fix as gnome-shell/gnome-desktop's
+# St-18/GnomeDesktop-4.0 dumpers.
 build() {
+    export LD_LIBRARY_PATH="/usr/lib:/lib:${LD_LIBRARY_PATH:-}"
+
     meson setup builddir \
         --prefix=/overlayer/syshub \
         --libdir=/overlayer/syshub/lib \
-        --includedir=/overlayer/syshub/include
+        --includedir=/overlayer/syshub/include \
+        --strip
     ninja -C builddir
     DESTDIR="$(pwd)/_zexbuild-install" ninja -C builddir install
 }
