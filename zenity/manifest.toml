@@ -1,0 +1,31 @@
+# manifest.toml - zenity (syshub tier)
+
+[package]
+name             = "zenity"
+version          = "4.2.2"
+description      = "Display GTK dialogs from the commandline or shell scripts"
+license          = "LGPL-2.1-or-later"
+maintainer       = "Ali Zain <alizain@zainiumdynamics.tech>"
+homepage         = "https://gitlab.gnome.org/GNOME/zenity"
+build_type       = "dynamic"
+libc_target      = "musl"
+
+blake3           = ""
+ed25519_sig      = ""
+ed25519_pubkey   = ""
+
+depends          = ["libadwaita", "gdk-pixbuf", "pango"]
+provides         = ["zenity"]
+tags             = ["gnome", "dialog", "cli"]
+
+[install]
+bin     = "/overlayer/syshub/bin"
+share   = "/overlayer/syshub/share"
+_syshub = true
+
+[remove]
+files    = []
+dirs     = []
+symlinks = []
+
+[hooks]

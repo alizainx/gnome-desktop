@@ -1,0 +1,31 @@
+maintainer="Ali Zain <alizain@zainiumdynamics.tech>"
+pkgname=zenity
+pkgver=4.2.2
+pkgrel=0
+# Meson, C. No systemd/elogind touchpoint - a commandline/shell-script
+# GTK dialog tool. webkit (HTML dialog mode) left off to minimize the
+# dependency edge (Alpine's real recipe doesn't build it either - no
+# webkit2gtk-dev in its makedepends). Man pages turned back on to
+# match Alpine, which does build them (help2man present).
+source="https://download.gnome.org/sources/zenity/4.2/zenity-$pkgver.tar.xz"
+sha256sums="019186a996096ef4fc356e21577b5673f5baa3a29ac8e3d608b753371c18018d  zenity-$pkgver.tar.xz"
+# makedepends matched against Alpine's real aports recipe
+# (community/zenity) - added help2man (drives -Dmanpage below),
+# intltool, itstool, libxml2-utils.
+makedepends="gdk-pixbuf-dev help2man intltool itstool libadwaita-dev libxml2-utils pango-dev"
+
+build() {
+    meson setup builddir \
+        --prefix=/overlayer/syshub \
+        --libdir=/overlayer/syshub/lib \
+        --includedir=/overlayer/syshub/include \
+        -Dwebkitgtk=disabled \
+        -Dmanpage=true
+    ninja -C builddir
+    DESTDIR="$(pwd)/_zexbuild-install" ninja -C builddir install
+}
+
+package() {
+    local inst="_zexbuild-install/overlayer/syshub"
+    cp -a "$inst"/. "$PAYLOAD_DIR"/
+}
