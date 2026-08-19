@@ -9,12 +9,6 @@ source="https://download.gnome.org/sources/gnome-shell/50/gnome-shell-$pkgver.ta
 
 sha256sums="c531939539db316a41aef23670370abd1330d3254f84bcb0f9f4dae5d6e362cf  gnome-shell-$pkgver.tar.xz"
 
-# mutter is our own real, published Zainium package now (musl,
-# syshub tier) - fetched via needs_toolchain below instead of apk,
-# so gnome-shell links against it and gets its actual
-# /overlayer/syshub rpath instead of Alpine's /usr/lib/mutter-18.
-needs_toolchain="mutter mutter-dev"
-
 makedepends="
     elogind-dev
     evolution-data-server-dev
@@ -41,6 +35,18 @@ makedepends="
 
 build() {
     patch -p1 < ../0001-shell-elogind-support-to-avoid-stubbed-sd_notify.patch
+
+    # mutter isn't published to the toolchain ledger yet - it's our own
+    # recipe already sitting on master, built the same way any package
+    # is: run ci/build.sh on it (same script, recursively) from the
+    # repo root ($OUT_DIR - a plain, unexported var from the outer
+    # build.sh invocation, visible here since ZEXBUILD is sourced into
+    # that same shell), then unpack the .zex it produces straight into
+    # /overlayer/syshub so gnome-shell links against our real musl
+    # mutter instead of Alpine's apk mutter-dev.
+    echo "-- building mutter first (not published yet, bundled here) --"
+    ( cd "$OUT_DIR" && sh ci/build.sh mutter )
+    "${SUBSTRATE:-substrate}" unpack "$OUT_DIR"/mutter-*.zex --output /overlayer/syshub
 
     export PKG_CONFIG_PATH="/overlayer/syshub/lib/pkgconfig:/overlayer/syshub/share/pkgconfig:${PKG_CONFIG_PATH:-}"
     export GI_TYPELIB_PATH="/overlayer/syshub/lib/girepository-1.0:/overlayer/syshub/share/girepository-1.0:${GI_TYPELIB_PATH:-}"
