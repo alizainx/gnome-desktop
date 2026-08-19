@@ -1,0 +1,33 @@
+# manifest.toml - polkit (syshub tier)
+
+[package]
+name             = "polkit"
+version          = "126"
+description      = "Policy framework for controlling privileges for system-wide services, elogind session tracking"
+license          = "LGPL-2.0"
+maintainer       = "Ali Zain <alizain@zainiumdynamics.tech>"
+homepage         = "https://www.freedesktop.org/wiki/Software/polkit"
+build_type       = "dynamic"
+libc_target      = "musl"
+
+blake3           = ""
+ed25519_sig      = ""
+ed25519_pubkey   = ""
+
+depends          = ["glib", "expat", "duktape", "quantra-logind"]
+provides         = ["polkit", "libpolkit-gobject-1.so"]
+tags             = ["policy", "privilege", "session"]
+
+[install]
+bin     = "/overlayer/syshub/bin"
+lib     = "/overlayer/syshub/lib"
+libexec = "/overlayer/syshub/libexec"
+share   = "/overlayer/syshub/share"
+_syshub = true
+
+[remove]
+files    = []
+dirs     = []
+symlinks = []
+
+[hooks]
