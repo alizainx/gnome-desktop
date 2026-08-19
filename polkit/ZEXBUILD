@@ -1,0 +1,51 @@
+maintainer="Ali Zain <alizain@zainiumdynamics.tech>"
+pkgname=polkit
+pkgver=126
+pkgrel=0
+# sys-auth/polkit in Gentoo, not gnome-base. Upstream moved off
+# freedesktop gitlab to https://github.com/polkit-org/polkit, tags are
+# releases (no "v" prefix, no .tar.xz - only a github archive tarball).
+# Tarball root is polkit-$pkgver (github archive convention), matches
+# ci/build.sh's auto-cd.
+# -Dsession_tracking=elogind: meson_options.txt has a session_tracking
+# combo option (logind/elogind/ConsoleKit), Gentoo's polkit-126-r3
+# ebuild sets it to "elogind" whenever USE=elogind, satisfied by
+# qlogind's libelogind.pc, no source patch needed (Gentoo's own
+# elogind.patch in files/ is for an older polkit series that predates
+# the in-tree session_tracking=elogind combo option - not needed here).
+# authfw=shadow, not pam: no PAM stack packaged in this repo yet, so
+# skip the sys-auth/pambase dependency chain entirely for the first
+# pass, matching how other recipes here drop optionals with unmet deps.
+source="https://github.com/polkit-org/polkit/archive/refs/tags/$pkgver.tar.gz"
+sha256sums="2814a7281989f6baa9e57bd33bbc5e148827e2721ccef22aaf28ab2b376068e8  $pkgver.tar.gz"
+# quantra-logind's libelogind.pc alias is this repo's own package, not
+# an apk stand-in - not listed here.
+makedepends="glib-dev expat-dev duktape-dev elogind-dev"
+# introspection off, gtk-doc/man off, same reasoning as every other
+# recipe here.
+build() {
+    export PKG_CONFIG_PATH="/overlayer/syshub/lib/pkgconfig:/overlayer/syshub/share/pkgconfig:${PKG_CONFIG_PATH:-}"
+
+    meson setup builddir \
+        --prefix=/overlayer/syshub \
+        --libdir=/overlayer/syshub/lib \
+        --includedir=/overlayer/syshub/include \
+        -Dsession_tracking=elogind \
+        -Dlibs-only=false \
+        -Dauthfw=shadow \
+        -Dpolkitd_user=polkitd \
+        -Dprivileged_group=0 \
+        -Dexamples=false \
+        -Dtests=false \
+        -Dintrospection=false \
+        -Dgtk_doc=false \
+        -Dman=false \
+        -Dgettext=false
+    ninja -C builddir
+    DESTDIR="$(pwd)/_zexbuild-install" ninja -C builddir install
+}
+
+package() {
+    local inst="_zexbuild-install/overlayer/syshub"
+    cp -a "$inst"/. "$PAYLOAD_DIR"/
+}
