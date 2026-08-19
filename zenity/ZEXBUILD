@@ -1,0 +1,40 @@
+maintainer="Ali Zain <alizain@zainiumdynamics.tech>"
+pkgname=zenity
+pkgver=4.2.2
+pkgrel=0
+# Meson, C. No systemd/elogind touchpoint - a commandline/shell-script
+# GTK dialog tool. webkit (HTML dialog mode) left off to minimize the
+# dependency edge (Alpine's real recipe doesn't build it either - no
+# webkit2gtk-dev in its makedepends).
+#
+# -Dmanpage=false: Alpine builds man pages fine because help2man runs
+# against a real native binary on their own build host. Here it
+# executes the just-built zenity binary directly during the build
+# (`ninja: job failed: /usr/bin/help2man ... builddir/src/zenity`) -
+# same class of build-time-execute problem as the various g-ir-scanner
+# dumpers elsewhere, except help2man isn't something LD_LIBRARY_PATH
+# can route around (it shells out to the target binary itself, not a
+# library it dlopens). Dropping the man page is the simpler fix; man
+# pages aren't required for the tool to function.
+source="https://download.gnome.org/sources/zenity/4.2/zenity-$pkgver.tar.xz"
+sha256sums="019186a996096ef4fc356e21577b5673f5baa3a29ac8e3d608b753371c18018d  zenity-$pkgver.tar.xz"
+# makedepends matched against Alpine's real aports recipe
+# (community/zenity), minus help2man (only needed for the disabled
+# man page build now).
+makedepends="gdk-pixbuf-dev intltool itstool libadwaita-dev libxml2-utils pango-dev"
+
+build() {
+    meson setup builddir \
+        --prefix=/overlayer/syshub \
+        --libdir=/overlayer/syshub/lib \
+        --includedir=/overlayer/syshub/include \
+        -Dwebkitgtk=false \
+        -Dmanpage=false
+    ninja -C builddir
+    DESTDIR="$(pwd)/_zexbuild-install" ninja -C builddir install
+}
+
+package() {
+    local inst="_zexbuild-install/overlayer/syshub"
+    cp -a "$inst"/. "$PAYLOAD_DIR"/
+}
