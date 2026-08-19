@@ -1,0 +1,33 @@
+# manifest.toml - evolution-data-server (syshub tier)
+
+[package]
+name             = "evolution-data-server"
+version          = "3.60.2"
+description      = "Evolution groupware backend (libcamel, libebook, libecal, libedataserver, ...)"
+license          = "LGPL-2.0-or-later"
+maintainer       = "Ali Zain <alizain@zainiumdynamics.tech>"
+homepage         = "https://gitlab.gnome.org/GNOME/evolution-data-server"
+build_type       = "dynamic"
+libc_target      = "musl"
+
+blake3           = ""
+ed25519_sig      = ""
+ed25519_pubkey   = ""
+
+depends          = ["libsecret", "sqlite", "glib", "libical", "libxml2", "nspr", "nss", "libsoup3", "json-glib", "icu", "zlib"]
+provides         = ["libedataserver-1.2.so", "libecal-2.0.so", "libebook-1.2.so", "libcamel-1.2.so"]
+tags             = ["gnome", "groupware", "library"]
+
+[install]
+bin     = "/overlayer/syshub/bin"
+lib     = "/overlayer/syshub/lib"
+libexec = "/overlayer/syshub/libexec"
+share   = "/overlayer/syshub/share"
+_syshub = true
+
+[remove]
+files    = []
+dirs     = []
+symlinks = []
+
+[hooks]
