@@ -23,6 +23,8 @@ build() {
         --prefix=/overlayer/syshub \
         --libdir=/overlayer/syshub/lib \
         --includedir=/overlayer/syshub/include \
+        -Dsystemduserunitdir=no \
+        -Dtmpfilesdir=no \
         -Dlogind=true \
         -Dadmin=false \
         -Dafc=false \
@@ -52,6 +54,7 @@ build() {
         -Dinstalled_tests=false \
         -Dman=false \
         -Dunit_tests=false
+
     ninja -C builddir
     DESTDIR="$(pwd)/_zexbuild-install" ninja -C builddir install
 }
