@@ -22,6 +22,7 @@ makedepends="glib-dev libffi-dev gobject-introspection-dev mozjs-dev cairo-dev"
 # gobject-introspection, spidermonkey (dev-lang/spidermonkey:140 in
 # Gentoo), cairo. gjs will not configure until these exist.
 build() {
+    export LD_LIBRARY_PATH="/usr/lib:/lib:/overlayer/syshub/lib:/overlayer/syshub/lib64:${LD_LIBRARY_PATH:-}"
     export LDFLAGS="${LDFLAGS:-} -Wl,-z,stack-size=2097152"
 
     meson setup builddir \
@@ -36,6 +37,7 @@ build() {
         -Dskip_dbus_tests=true \
         -Dskip_gtk_tests=true \
         -Dverbose_logs=false
+
     ninja -C builddir
     DESTDIR="$(pwd)/_zexbuild-install" ninja -C builddir install
 }
