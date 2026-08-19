@@ -1,0 +1,22 @@
+maintainer="Ali Zain <alizain@zainiumdynamics.tech>"
+pkgname=tecla
+pkgver=49.0
+pkgrel=0
+# Meson, C. No systemd/elogind touchpoint - a keyboard-layout viewer.
+source="https://download.gnome.org/sources/tecla/49/tecla-$pkgver.tar.xz"
+sha256sums="2ca424e402baf60cd6b13777703b701ebb1faf8f3d0f2f971144d823f651249f  tecla-$pkgver.tar.xz"
+makedepends="gtk4.0-dev libadwaita-dev libxkbcommon-dev"
+
+build() {
+    meson setup builddir \
+        --prefix=/overlayer/syshub \
+        --libdir=/overlayer/syshub/lib \
+        --includedir=/overlayer/syshub/include
+    ninja -C builddir
+    DESTDIR="$(pwd)/_zexbuild-install" ninja -C builddir install
+}
+
+package() {
+    local inst="_zexbuild-install/overlayer/syshub"
+    cp -a "$inst"/. "$PAYLOAD_DIR"/
+}
