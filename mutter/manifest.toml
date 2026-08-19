@@ -2,7 +2,7 @@
 
 [package]
 name             = "mutter"
-version          = "49.7"
+version          = "50.4"
 description      = "GNOME compositing window manager, systemd-optional build (elogind/qlogind)"
 license          = "GPL-2.0-or-later"
 maintainer       = "Ali Zain <alizain@zainiumdynamics.tech>"
