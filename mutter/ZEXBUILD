@@ -40,7 +40,7 @@ build() {
         -Dremote_desktop=false \
         -Dprofiler=false \
         -Ddevkit=disabled \
-        -Dtests=disabled
+        -Dtests=disabled \
         -Dlogind=true
     ninja -C builddir
     DESTDIR="$(pwd)/_zexbuild-install" ninja -C builddir install
