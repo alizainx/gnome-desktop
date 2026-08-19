@@ -86,7 +86,15 @@ jobs:
 
       - name: Build changed packages
         env:
-          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          # github.event.pull_request.base.sha is a snapshot from when
+          # the PR was opened -- it does NOT advance on later pushes to
+          # base (master), so once other PRs merge, every open PR's
+          # check job starts diffing against a stale base and rebuilds
+          # everything merged since, not just its own package. The base
+          # branch NAME resolves to its live tip commit instead (we
+          # have full history via fetch-depth: 0), so this stays
+          # correct across the PR's whole lifetime.
+          BASE_SHA: ${{ github.event.pull_request.base.ref }}
         run: |
           pkgs_out="$(mktemp)"
           if ! sh ci/changed-packages.sh > "$pkgs_out"; then
