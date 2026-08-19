@@ -27,17 +27,23 @@ makedepends="
 "
 
 build() {
-    # panel-run-dialog.c:44 hard-#includes <libgnome-desktop/gnome-systemd.h>
-    # and calls gnome_start_systemd_scope() (a 7-line call, lines
-    # 507-514 in 3.58.1) unconditionally, no HAVE_ELOGIND-style guard -
-    # this header isn't present in this CI container's gnome-desktop-dev,
-    # so it must go. Verified against the real upstream source this
-    # time (previous attempt used a wrong `+2d` range that only deleted
-    # 3 of the function call's 8 lines, corrupting the statement instead
-    # of removing it - hence the syntax error a few lines later).
+    # panel-run-dialog.c hard-#includes <libgnome-desktop/gnome-systemd.h>
+    # and calls gnome_start_systemd_scope() unconditionally, no
+    # HAVE_ELOGIND-style guard - this header isn't present in this CI
+    # container's gnome-desktop-dev, so it must go. Checked against the
+    # actual downloaded 3.58.1 tarball: the call is exactly 7 lines,
+    # match line through "NULL);":
+    #   gnome_start_systemd_scope (locale_command,
+    #                              pid, NULL, NULL, NULL, NULL, NULL);
+    # `+7d` (used twice before) deletes 8 lines - match + 7 - eating
+    # the blank line *and* the enclosing block's closing brace right
+    # after, which is what actually caused the cascading "invalid
+    # storage class" errors from that point to EOF. `+6d` deletes
+    # exactly match + 6 continuation lines = the whole statement, no
+    # more.
     sed -i '/#include <libgnome-desktop\/gnome-systemd\.h>/d' \
         modules/action-button/panel-run-dialog.c
-    sed -i '/gnome_start_systemd_scope (locale_command,/,+7d' \
+    sed -i '/gnome_start_systemd_scope (locale_command,/,+6d' \
         modules/action-button/panel-run-dialog.c
 
     local action_modules="gio-unix-2.0 gtk+-3.0 libgnome-menu-3.0 libelogind x11"
