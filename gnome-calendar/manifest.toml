@@ -1,0 +1,31 @@
+# manifest.toml - gnome-calendar (syshub tier)
+
+[package]
+name             = "gnome-calendar"
+version          = "49.1"
+description      = "Calendar application for GNOME"
+license          = "GPL-3.0-or-later"
+maintainer       = "Ali Zain <alizain@zainiumdynamics.tech>"
+homepage         = "https://apps.gnome.org/Calendar/"
+build_type       = "dynamic"
+libc_target      = "musl"
+
+blake3           = ""
+ed25519_sig      = ""
+ed25519_pubkey   = ""
+
+depends          = ["libical", "gsettings-desktop-schemas", "evolution-data-server", "libsoup3", "libadwaita", "glib", "gtk4", "libgweather", "geoclue", "geocode-glib"]
+provides         = ["gnome-calendar"]
+tags             = ["gnome", "calendar", "app"]
+
+[install]
+bin     = "/overlayer/syshub/bin"
+share   = "/overlayer/syshub/share"
+_syshub = true
+
+[remove]
+files    = []
+dirs     = []
+symlinks = []
+
+[hooks]
