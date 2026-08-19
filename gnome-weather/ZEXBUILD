@@ -1,0 +1,47 @@
+maintainer="Ali Zain <alizain@zainiumdynamics.tech>"
+pkgname=gnome-weather
+pkgver=50.0
+pkgrel=0
+# Meson, TypeScript (transpiled to GJS-compatible JS at build time,
+# needs a host "tsc" same as pop-shell - not a cross-compilation
+# concern, no C beyond a trivial helper). No systemd/elogind
+# touchpoint. Carries one patch, same one Gentoo carries: tsconfig.json
+# used a "baseUrl" + bare "src/..." import that only worked with
+# TypeScript's older (pre-6.0) module resolution; TS 6 dropped that
+# behavior, breaking the build. Fixed upstream by switching to a
+# relative import and "rootDir" instead of "baseUrl".
+source="https://download.gnome.org/sources/gnome-weather/50/gnome-weather-$pkgver.tar.xz
+0001-typescript6.patch"
+sha256sums="57de7578605f91f9ab400551ce7738db7505bc88f42a33c70ce7a70167fdb513  gnome-weather-$pkgver.tar.xz"
+# Verified against Alpine's own real gnome-weather APKBUILD
+# makedepends verbatim (including typescript, the host tsc tool).
+makedepends="geoclue-dev gjs-dev glib-dev gobject-introspection-dev gtk4.0-dev libadwaita-dev libgweather4-dev typescript"
+
+# Deps this recipe assumes, none published yet: glib,
+# gobject-introspection, gtk4, gjs, geoclue, libadwaita, libgweather,
+# gsettings-desktop-schemas, libxml2 (host, for glib-compile-resources).
+#
+# pkgname/pkgver already match the tarball's root dir exactly
+# (gnome-weather-50.0) - ci/build.sh's own auto-cd after extraction
+# already lands here, no explicit `cd` needed (the old recipe had one,
+# which would have failed: a `cd gnome-weather-$pkgver` from inside a
+# directory that's already named that looks for a nonexistent nested
+# subdirectory).
+build() {
+    patch -p1 < ../0001-typescript6.patch
+
+    meson setup builddir \
+        --prefix=/overlayer/syshub \
+        --libdir=/overlayer/syshub/lib \
+        --includedir=/overlayer/syshub/include \
+        -Dprofile=default \
+        -Ddogtail=false
+    ninja -C builddir
+    DESTDIR="$(pwd)/_zexbuild-install" ninja -C builddir install
+}
+
+package() {
+    local inst="_zexbuild-install/overlayer/syshub"
+    mkdir -p "$PAYLOAD_DIR"
+    cp -a "$inst"/. "$PAYLOAD_DIR"/
+}

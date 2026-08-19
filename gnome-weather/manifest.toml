@@ -1,0 +1,31 @@
+# manifest.toml - gnome-weather (syshub tier)
+
+[package]
+name             = "gnome-weather"
+version          = "50.0"
+description      = "Weather application for GNOME"
+license          = "GPL-2.0-or-later"
+maintainer       = "Ali Zain <alizain@zainiumdynamics.tech>"
+homepage         = "https://apps.gnome.org/Weather/"
+build_type       = "dynamic"
+libc_target      = "musl"
+
+blake3           = ""
+ed25519_sig      = ""
+ed25519_pubkey   = ""
+
+depends          = ["glib", "gobject-introspection", "gtk4", "gjs", "geoclue", "libadwaita", "libgweather", "gsettings-desktop-schemas"]
+provides         = ["gnome-weather"]
+tags             = ["gnome", "weather", "app"]
+
+[install]
+bin     = "/overlayer/syshub/bin"
+share   = "/overlayer/syshub/share"
+_syshub = true
+
+[remove]
+files    = []
+dirs     = []
+symlinks = []
+
+[hooks]
