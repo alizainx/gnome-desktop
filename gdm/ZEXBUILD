@@ -16,7 +16,7 @@ pkgrel=0
 # not carried.
 source="https://download.gnome.org/sources/gdm/49/gdm-$pkgver.tar.xz"
 sha256sums="b62a33c2bf61a7037221e0dca372f6c6cf250bfe78a87bcb7b07c69bdff7e538  gdm-$pkgver.tar.xz"
-makedepends="glib-dev libgudev-dev dconf-dev dbus-dev gtk+3.0-dev accountsservice-dev keyutils-dev json-glib-dev gobject-introspection-dev eudev-dev linux-pam-dev elogind-dev"
+makedepends="glib-dev libgudev-dev dconf-dev dbus-dev gtk+3.0-dev accountsservice-dev keyutils-dev json-glib-dev gobject-introspection-dev eudev-dev linux-pam-dev elogind-dev libx11-dev libxau-dev libxcb-dev gettext"
 
 # Deps this recipe assumes, none published yet: glib, libgudev, dconf,
 # gnome-settings-daemon, gsettings-desktop-schemas, dbus, gtk (X11
@@ -24,6 +24,14 @@ makedepends="glib-dev libgudev-dev dconf-dev dbus-dev gtk+3.0-dev accountsservic
 # gobject-introspection, and virtual/udev. No PAM stack packaged yet
 # either - gdm hard-depends on it (login manager), listed anyway.
 # gdm will not configure until these exist.
+#
+# libx11-dev/libxau-dev/libxcb-dev: meson.build's `if have_x11_support`
+# block (our -Dx11-support=true) unconditionally does dependency('x11'),
+# dependency('xau'), dependency('xcb') - missing before. gettext:
+# po/meson.build calls i18n.gettext() unconditionally, needing
+# msgfmt/xgettext at build time - also missing. (itstool, listed in
+# Alpine's own gdm makedepends, is for their older 48.0; no itstool/
+# merge_file call anywhere in 49.4's meson.build tree - not needed.)
 build() {
     meson setup builddir \
         --prefix=/overlayer/syshub \
