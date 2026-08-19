@@ -1,6 +1,6 @@
 maintainer="Ali Zain <alizain@zainiumdynamics.tech>"
 pkgname=mutter
-pkgver=49.7
+pkgver=50.4
 pkgrel=0
 # meson.build: -Dlogind=true makes it try dependency('libsystemd') first,
 # falling back to dependency('libelogind') if that's not found (see
@@ -9,8 +9,8 @@ pkgrel=0
 # No patch needed, confirmed against the actual meson.build in the
 # tarball, not guessed. Gentoo's x11-wm/mutter-49.7.ebuild sets this
 # exact flag when either USE=elogind or USE=systemd.
-source="https://download.gnome.org/sources/mutter/49/mutter-$pkgver.tar.xz"
-sha256sums="abdd71e2eac66840623aabf4f2a688373f1d49ac4969665836a63df3780685b1  mutter-$pkgver.tar.xz"
+source="https://download.gnome.org/sources/mutter/50/mutter-$pkgver.tar.xz"
+sha256sums="273d33c875abcb4b6cbea3f4ec045d18155fbc510c3521fc7e47926371310988  mutter-$pkgver.tar.xz"
 # gnome-settings-daemon and quantra-logind are runtime session
 # companions, not build-time link deps, so they're left out here even
 # though they're in manifest.toml's depends.
@@ -64,7 +64,7 @@ build() {
         -Dinstalled_tests=false \
         -Dfonts=true \
         -Dbash_completion=false \
-        -Ddevkit=false \
+        -Ddevkit=disabled \
         -Degl_device=false \
         -Dwayland_eglstream=false
     ninja -C builddir
