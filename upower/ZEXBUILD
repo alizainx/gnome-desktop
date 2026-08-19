@@ -20,6 +20,8 @@ sha256sums="12227b3dcd34c5097bbda25984b192ea0bd5e11dce479358d9ef70415a38e4b6  up
 makedepends="glib-dev dbus-dev libgudev-dev polkit-dev"
 
 # introspection off, same reasoning as every other recipe here.
+# -Dintrospection is a meson feature option here (enabled/disabled/
+# auto), not boolean - "false" errors with "not one of the choices".
 build() {
     cd upower-v$pkgver
 
@@ -30,7 +32,7 @@ build() {
         --localstatedir=/var \
         -Dman=false \
         -Dgtk-doc=false \
-        -Dintrospection=false \
+        -Dintrospection=disabled \
         -Dsystemdsystemunitdir=/overlayer/syshub/lib/systemd/system \
         -Dos_backend=linux \
         -Dpolkit=enabled \
