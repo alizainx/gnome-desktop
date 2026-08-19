@@ -1,0 +1,34 @@
+# manifest.toml - gdm (syshub tier)
+
+[package]
+name             = "gdm"
+version          = "49.4"
+description      = "GNOME Display Manager, systemd-optional build (elogind/qlogind)"
+license          = "GPL-2.0-or-later"
+maintainer       = "Ali Zain <alizain@zainiumdynamics.tech>"
+homepage         = "https://gitlab.gnome.org/GNOME/gdm"
+build_type       = "dynamic"
+libc_target      = "musl"
+
+blake3           = ""
+ed25519_sig      = ""
+ed25519_pubkey   = ""
+
+depends          = ["glib", "libgudev", "dconf", "gnome-settings-daemon", "gsettings-desktop-schemas", "dbus", "gtk3", "accountsservice", "keyutils", "json-glib", "gobject-introspection", "pam", "quantra-logind"]
+provides         = ["gdm"]
+tags             = ["gnome", "display-manager", "login"]
+
+[install]
+bin     = "/overlayer/syshub/bin"
+lib     = "/overlayer/syshub/lib"
+libexec = "/overlayer/syshub/libexec"
+share   = "/overlayer/syshub/share"
+etc     = "/overlayer/syshub/etc"
+_syshub = true
+
+[remove]
+files    = []
+dirs     = []
+symlinks = []
+
+[hooks]
