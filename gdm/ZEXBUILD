@@ -43,7 +43,7 @@ build() {
         -Dgroup=gdm \
         -Dlibaudit=disabled \
         -Dlogind-provider=elogind \
-        -Dplymouth=enable \
+        -Dplymouth=auto \
         -Drun-dir=/run/gdm \
         -Dselinux=disabled \
         -Dsystemd-journal=false \
