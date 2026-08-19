@@ -1,0 +1,31 @@
+# manifest.toml - dconf-editor (syshub tier)
+
+[package]
+name             = "dconf-editor"
+version          = "49.0"
+description      = "Graphical tool for editing the dconf configuration database"
+license          = "GPL-3.0-or-later"
+maintainer       = "Ali Zain <alizain@zainiumdynamics.tech>"
+homepage         = "https://gitlab.gnome.org/GNOME/dconf-editor"
+build_type       = "dynamic"
+libc_target      = "musl"
+
+blake3           = ""
+ed25519_sig      = ""
+ed25519_pubkey   = ""
+
+depends          = ["dconf", "glib", "gtk3", "libhandy"]
+provides         = ["dconf-editor"]
+tags             = ["gnome", "config", "gsettings", "gui"]
+
+[install]
+bin     = "/overlayer/syshub/bin"
+share   = "/overlayer/syshub/share"
+_syshub = true
+
+[remove]
+files    = []
+dirs     = []
+symlinks = []
+
+[hooks]

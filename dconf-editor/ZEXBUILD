@@ -1,0 +1,26 @@
+maintainer="Ali Zain <alizain@zainiumdynamics.tech>"
+pkgname=dconf-editor
+pkgver=49.0
+pkgrel=0
+# No systemd/elogind dependency at all, and no meson_options.txt even
+# exists in this tarball - a plain Vala/GTK3 app with zero configurable
+# build flags. No patch needed.
+source="https://download.gnome.org/sources/dconf-editor/49/dconf-editor-$pkgver.tar.xz"
+sha256sums="90a8ccfadf51dff31e0028324fb9a358b2d26c5ae861a71c7dbf9f4dd9bdd399  dconf-editor-$pkgver.tar.xz"
+makedepends="dconf-dev glib-dev gtk+3.0-dev libhandy1-dev vala"
+
+build() {
+    meson setup builddir \
+        --prefix=/overlayer/syshub \
+        --libdir=/overlayer/syshub/lib \
+        --includedir=/overlayer/syshub/include
+    ninja -C builddir
+    DESTDIR="$(pwd)/_zexbuild-install" ninja -C builddir install
+}
+
+package() {
+    local inst="_zexbuild-install/overlayer/syshub"
+    mkdir -p "$PAYLOAD_DIR/bin" "$PAYLOAD_DIR/share"
+    cp -a "$inst"/bin/. "$PAYLOAD_DIR/bin/" 2>/dev/null || true
+    cp -a "$inst"/share/. "$PAYLOAD_DIR/share/" 2>/dev/null || true
+}
