@@ -23,15 +23,31 @@ pkgrel=0
 # reflects that.
 source="https://download.gnome.org/sources/gnome-control-center/49/gnome-control-center-$pkgver.tar.xz"
 sha256sums="a6080394334a7b2ba3ab6702e9f26dd5a5e75c1fda1d14e36c8e06764d6413fc  gnome-control-center-$pkgver.tar.xz"
-makedepends="glib-dev gtk4.0-dev libadwaita-dev accountsservice-dev colord-dev gdk-pixbuf-dev gnome-desktop-dev gsettings-desktop-schemas-dev libxml2-dev upower-dev libgudev-dev gcr4-dev libpwquality-dev polkit-dev cairo-dev fontconfig-dev libgtop-dev udisks2-dev libsecret-dev gnutls-dev gsound-dev pango-dev networkmanager-dev libnma-dev gnome-bluetooth-dev krb5-dev libwacom-dev cups-dev samba-dev gnome-online-accounts-dev"
+makedepends="glib-dev gtk4.0-dev libadwaita-dev accountsservice-dev colord-dev gdk-pixbuf-dev gnome-desktop-dev gsettings-desktop-schemas-dev libxml2-dev upower-dev libgudev-dev gcr4-dev libpwquality-dev polkit-dev cairo-dev fontconfig-dev libgtop-dev udisks2-dev libsecret-dev gnutls-dev gsound-dev pango-dev networkmanager-dev libnma-dev gnome-bluetooth-dev krb5-dev libwacom-dev cups-dev samba-dev gnome-online-accounts-dev libepoxy-dev json-glib-dev pulseaudio-dev gnome-settings-daemon-dev tecla-dev modemmanager-dev gettext blueprint-compiler"
 
 # Deps this recipe assumes, none published yet: glib, gtk4, libadwaita,
 # accountsservice, colord, gdk-pixbuf, gnome-desktop, gsettings-desktop-schemas,
-# libxml2, upower, libgudev, gcr, libpwquality, polkit, cairo, colord-gtk,
+# libxml2, upower, libgudev, gcr, libpwquality, polkit, cairo,
 # fontconfig, libgtop, udisks, libsecret, gnutls, gsound, pango, plus the
 # whole unconditional panel dependency set noted above (NetworkManager,
 # gnome-bluetooth, mit-krb5, libwacom, cups, samba, ibus,
 # gnome-online-accounts). Will not configure until all of these exist.
+#
+# Re-audited meson.build's actual dependency() calls directly (not just
+# Gentoo's ebuild): epoxy, json-glib-1.0, libpulse(-mainloop-glib),
+# gnome-settings-daemon (>=48.rc, fallback: subproject "gsd" which the
+# release tarball doesn't bundle), mm-glib (Linux-only, no option gate)
+# and tecla (>=47.0, required:false but falls back to subproject()
+# which also isn't bundled in the tarball) are all real unconditional
+# build deps that were missing - libepoxy-dev/json-glib-dev/
+# pulseaudio-dev/gnome-settings-daemon-dev/modemmanager-dev/tecla-dev
+# added (gnome-settings-daemon-dev and tecla-dev are Alpine's own
+# same-named builds, used purely as build-time stand-ins same as
+# gtk4.0-dev elsewhere in this repo). blueprint-compiler (find_program,
+# required) and gettext (po/meson.build's unconditional i18n.gettext())
+# were also missing. colord-gtk, dropped from the earlier version of
+# this comment, isn't actually referenced by 49.9's meson.build at all
+# - was never a real dependency.
 build() {
     meson setup builddir \
         --prefix=/overlayer/syshub \
