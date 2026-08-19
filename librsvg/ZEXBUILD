@@ -2,88 +2,57 @@ maintainer="Ali Zain <alizain@zainiumdynamics.tech>"
 pkgname=librsvg
 pkgver=2.62.3
 pkgrel=0
-# Rust + meson (meson wraps cargo-c to build libRSvg.so + rsvg-convert
-# + the gdk-pixbuf loader). No systemd/elogind touchpoint anywhere in
-# meson_options.txt - confirmed by reading it directly, this is a
-# pure rendering library. Same unresolved blocker as quantra-logind:
-# Rust recipe plumbing (target spec at
-# targets/x86_64-zainium-linux-musl.json, see userland-recipes'
-# README "Rust packages - target spec") isn't wired into ci/build.sh
-# yet, and cargo-c itself has no recipe here either. Written against
-# the layout so it's correct once that lands, not CI-runnable today.
-#
-# gentoo-crate-dist publishes a pre-vendored crates tarball per
-# version (same one Gentoo's own ebuild fetches via CARGO_CRATE_URIS)
-# so the build can run with --offline and no network access to
-# crates.io, matching how CI is expected to work for every other
-# recipe here.
-source="https://download.gnome.org/sources/librsvg/2.62/librsvg-$pkgver.tar.xz
-https://github.com/gentoo-crate-dist/librsvg/releases/download/$pkgver/librsvg-$pkgver-crates.tar.xz"
-sha256sums="7eb449b2722a768021356f66dfee3202c229b54ed4e6a70ce40c090e97ff16f2  librsvg-$pkgver.tar.xz
-511f49a1faa31d7faf85b0de2bc2a7f483f10f52ab7e4c2413268f3592129f44  librsvg-$pkgver-crates.tar.xz"
 
-# makedepends matched against Alpine's real aports recipe
-# (community/librsvg) - added bzip2-dev, cargo, dav1d-dev,
-# gobject-introspection-dev, libgsf-dev, vala to mirror Alpine's list;
-# dropped font-dejavu/gi-docgen/py3-docutils/git since those are only
-# for Alpine's disabled test/doc/git-init steps, none of which this
-# recipe runs. freetype-dev/harfbuzz-dev/libxml2-dev/pango-dev are
-# librsvg's own real link deps, pulled in on Alpine transitively via
-# cairo-dev/pango's own depends_dev but listed explicitly here.
-makedepends="bzip2-dev cairo-dev cargo cargo-c dav1d-dev freetype-dev gdk-pixbuf-dev glib-dev gobject-introspection-dev harfbuzz-dev libgsf-dev libxml2-dev pango-dev vala"
+# Rewritten from scratch - the previous version used a hand-rolled
+# meson cross-file pointing rustc at a nonexistent
+# targets/x86_64-zainium-linux-musl.json (that whole cross-compile
+# plumbing was never wired up: $RECIPE_ROOT isn't even a variable
+# ci/build.sh sets, "parameter not set" under set -u). Every other
+# recipe in this repo does a NATIVE build inside the Alpine container
+# --host="$CHOST" is just triple-tagging, not real cross-compilation,
+# same as gnome-shell/evolution-data-server/etc - librsvg needs the
+# same treatment, not its own architecture. Alpine's real librsvg
+# APKBUILD (community/librsvg) is a plain native abuild-meson build
+# with cargo/cargo-c fetching from crates.io normally (options="net"),
+# no offline vendoring - dropped the gentoo-crate-dist crates tarball
+# too, this CI container has network access same as Alpine's builders
+# do (substrate itself gets cargo-installed from crates.io in the
+# same job).
+source="https://download.gnome.org/sources/librsvg/2.62/librsvg-$pkgver.tar.xz"
+sha256sums="7eb449b2722a768021356f66dfee3202c229b54ed4e6a70ce40c090e97ff16f2  librsvg-$pkgver.tar.xz"
 
-# ci/build.sh's auto-cd already lands in librsvg-$pkgver (tarball root
-# matches $pkgname-$pkgver) - no explicit cd needed here.
+# Matches Alpine's real makedepends verbatim, minus font-dejavu/
+# gi-docgen/py3-docutils/git (only needed for Alpine's disabled test/
+# doc/git-init steps - we don't run check(), so skipped same as
+# Alpine's own default `want_check` false path does).
+makedepends="bzip2-dev cairo-dev cargo cargo-c dav1d-dev gdk-pixbuf-dev glib-dev gobject-introspection-dev libgsf-dev meson vala"
+
 build() {
-    mkdir -p .cargo
-    tar xf ../librsvg-$pkgver-crates.tar.xz -C .cargo
+    # librsvg's build.rs runs `git describe` for its version string
+    # and fails without a repo present - Alpine's prepare() does the
+    # same `git init -q` for this exact reason.
+    git init -q
 
-    local sysroot="/overlayer/syshub"
-    local musl_sysroot="${sysroot}/x86_64-zainium-linux-musl"
-    local cross="${sysroot}/bin/x86_64-zainium-linux-musl"
+    export RUSTFLAGS="${RUSTFLAGS:-} -C debuginfo=1"
 
-    cat > crossfile.ini <<EOF
-[binaries]
-c = '${cross}-gcc'
-ar = '${cross}-ar'
-strip = '${cross}-strip'
-ranlib = '${cross}-ranlib'
-pkg-config = 'pkg-config'
-rust = ['rustc', '--target=$RECIPE_ROOT/../targets/x86_64-zainium-linux-musl.json']
-
-[host_machine]
-system = 'linux'
-cpu_family = 'x86_64'
-cpu = 'x86_64'
-endian = 'little'
-
-[properties]
-sys_root = '${musl_sysroot}'
-pkg_config_libdir = '${sysroot}/lib/pkgconfig:${sysroot}/share/pkgconfig'
-EOF
-
-    export PKG_CONFIG_LIBDIR="${sysroot}/lib/pkgconfig:${sysroot}/share/pkgconfig"
-    export PKG_CONFIG_ALLOW_CROSS=1
-    export CARGO_HOME="$(pwd)/.cargo"
-    export CARGO_NET_OFFLINE=true
-
-    # Flags match Alpine's abuild-meson invocation exactly (introspection,
-    # pixbuf, vala enabled; pixbuf-loader, tests disabled; avif enabled).
     meson setup builddir \
-        --cross-file=crossfile.ini \
         --prefix=/overlayer/syshub \
-        --libdir=lib \
-        -Davif=enabled \
+        --libdir=/overlayer/syshub/lib \
+        --includedir=/overlayer/syshub/include \
         -Dintrospection=enabled \
         -Dpixbuf=enabled \
         -Dpixbuf-loader=disabled \
-        -Ddocs=disabled \
         -Dvala=enabled \
-        -Dtests=false
+        -Dtests=false \
+        -Davif=enabled \
+        --strip
 
     ninja -C builddir
+    DESTDIR="$(pwd)/_zexbuild-install" ninja -C builddir install
 }
 
 package() {
-    DESTDIR="$PAYLOAD_DIR" ninja -C builddir install
+    local inst="_zexbuild-install/overlayer/syshub"
+    mkdir -p "$PAYLOAD_DIR"
+    cp -a "$inst"/. "$PAYLOAD_DIR"/
 }
