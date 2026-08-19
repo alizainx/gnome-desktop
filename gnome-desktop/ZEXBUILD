@@ -2,40 +2,29 @@ maintainer="Ali Zain <alizain@zainiumdynamics.tech>"
 pkgname=gnome-desktop
 pkgver=44.5
 pkgrel=0
-# systemd is a plain optional meson_feature here (not a required/elogind
-# fallback split like gnome-session/gnome-settings-daemon), so
-# -Dsystemd=disabled just drops the dependency. No patch needed.
+
+# Rewritten to mirror Alpine's real aports recipe (community/gnome-desktop)
+# as closely as possible - same makedepends, same meson flags. systemd
+# option doesn't even appear there (it's not a dependency this package
+# has at all), so no -Dsystemd flag needed either way.
 source="https://download.gnome.org/sources/gnome-desktop/44/gnome-desktop-$pkgver.tar.xz"
 sha256sums="20e0995a6e3a03e8c1026c5a27bc3f45e69ffcc392ad743dcab6107a541d232f  gnome-desktop-$pkgver.tar.xz"
-makedepends="gdk-pixbuf-dev gtk4.0-dev xkeyboard-config libxkbcommon-dev iso-codes cairo-dev gobject-introspection-dev"
+makedepends="gobject-introspection-dev gsettings-desktop-schemas-dev eudev-dev fontconfig-dev gdk-pixbuf-dev glib-dev gtk+3.0-dev gtk4.0-dev iso-codes-dev itstool libseccomp-dev libxml2-utils meson xkeyboard-config-dev"
 
-# Not published yet: gdk-pixbuf, gtk4, xkeyboard-config, libxkbcommon,
-# iso-codes, cairo, gobject-introspection. Will not configure until
-# those exist. udev also disabled here since virtual/libudev has no
-# recipe either.
 build() {
     meson setup builddir \
         --prefix=/overlayer/syshub \
         --libdir=/overlayer/syshub/lib \
         --includedir=/overlayer/syshub/include \
-        -Ddesktop_docs=false \
-        -Ddebug_tools=false \
-        -Dudev=disabled \
-        -Dsystemd=disabled \
-        -Dgtk_doc=false \
-        -Dinstalled_tests=false \
+        -Dudev=enabled \
         -Dbuild_gtk4=true \
-        -Dlegacy_library=false \
-        -Dintrospection=false
+        -Dlegacy_library=true
     ninja -C builddir
     DESTDIR="$(pwd)/_zexbuild-install" ninja -C builddir install
 }
 
 package() {
     local inst="_zexbuild-install/overlayer/syshub"
-    mkdir -p "$PAYLOAD_DIR/lib" "$PAYLOAD_DIR/share"
-    cp -a "$inst"/lib/. "$PAYLOAD_DIR/lib/" 2>/dev/null || true
-    rm -rf "$PAYLOAD_DIR/lib/pkgconfig"
-    find "$PAYLOAD_DIR/lib" -maxdepth 1 \( -name '*.a' -o -name '*.la' \) -delete
-    cp -a "$inst"/share/. "$PAYLOAD_DIR/share/" 2>/dev/null || true
+    mkdir -p "$PAYLOAD_DIR"
+    cp -a "$inst"/. "$PAYLOAD_DIR"/
 }
