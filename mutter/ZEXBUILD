@@ -22,12 +22,16 @@ sha256sums="abdd71e2eac66840623aabf4f2a688373f1d49ac4969665836a63df3780685b1  mu
 # pulls in libdrm ("if have_wayland or have_native_backend" in
 # meson.build) and wayland-protocols (data-only pkg, separate from
 # wayland-dev's libs) - both were missing too.
-makedepends="glib-dev gtk4.0-dev pango-dev cairo-dev pixman-dev fribidi-dev gsettings-desktop-schemas-dev libxkbcommon-dev at-spi2-core-dev dbus-dev colord-dev lcms2-dev harfbuzz-dev libei-dev libdisplay-info-dev libcanberra-dev libglycin-dev libdrm-dev mesa-dev wayland-dev wayland-protocols gnome-desktop-dev libx11-dev libxcomposite-dev libxcursor-dev libxdamage-dev libxext-dev libxfixes-dev libxi-dev xkeyboard-config libxrandr-dev libxcb-dev libxinerama-dev libxau-dev"
+makedepends="glib-dev gtk4.0-dev pango-dev cairo-dev pixman-dev fribidi-dev gsettings-desktop-schemas-dev libxkbcommon-dev at-spi2-core-dev dbus-dev colord-dev lcms2-dev harfbuzz-dev libei-dev libdisplay-info-dev libcanberra-dev libglycin-dev libdrm-dev mesa-dev wayland-dev wayland-protocols gnome-desktop-dev xkeyboard-config libgudev-dev libinput-dev eudev-dev"
 
-# native_backend/udev/remote_desktop/libwacom/devkit all off: no
-# libgudev/libinput/mesa-gbm/pipewire/libadwaita recipes yet, so this
-# is an X11+nested-Wayland build for now, not a standalone Wayland
-# session - revisit once those land.
+# Wayland-only, no X11: -Dx11=false drops the whole libX11/libxcb/etc.
+# makedepends block above (mutter can no longer run as an X server or
+# a WM inside one). -Dnative_backend=true is required for this to
+# actually start standalone (DRM/KMS via libdrm, input via libinput,
+# device enumeration via libgudev/eudev) - without it and without X11
+# there would be no backend at all. -Dxwayland stays false: that's the
+# separate X11-app-compat layer inside a Wayland session, not
+# mutter-as-X-server, and no Xwayland recipe exists yet either.
 build() {
     meson setup builddir \
         --prefix=/overlayer/syshub \
@@ -35,16 +39,16 @@ build() {
         --includedir=/overlayer/syshub/include \
         -Dopengl=true \
         -Degl=true \
-        -Dglx=true \
+        -Dglx=false \
         -Dgles2=true \
         -Dwayland=true \
         -Dxwayland=false \
-        -Dx11=true \
+        -Dx11=false \
         -Dlogind=true \
-        -Dnative_backend=false \
+        -Dnative_backend=true \
         -Dremote_desktop=false \
         -Dlibgnome_desktop=true \
-        -Dudev=false \
+        -Dudev=true \
         -Dlibwacom=false \
         -Dsound_player=false \
         -Dstartup_notification=false \
