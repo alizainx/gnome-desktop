@@ -37,6 +37,11 @@ makedepends="
 build() {
     patch -p1 < ../0001-shell-elogind-support-to-avoid-stubbed-sd_notify.patch
 
+    export LD_LIBRARY_PATH="/overlayer/syshub/lib:${LD_LIBRARY_PATH:-}"
+    export PKG_CONFIG_PATH="/overlayer/syshub/lib/pkgconfig:/overlayer/syshub/share/pkgconfig:${PKG_CONFIG_PATH:-}"
+    export GI_TYPELIB_PATH="/overlayer/syshub/lib/girepository-1.0:/overlayer/syshub/share/girepository-1.0:${GI_TYPELIB_PATH:-}"
+    export XDG_DATA_DIRS="/overlayer/syshub/share:${XDG_DATA_DIRS:-/usr/share}"
+
     meson setup builddir \
         --prefix=/overlayer/syshub \
         --libdir=/overlayer/syshub/lib \
@@ -51,31 +56,9 @@ build() {
         -Dnetworkmanager=false \
         -Dportal_helper=false
 
-
-    echo "=== MUTTER NEEDED ==="
-    find builddir -name 'libmutter-cogl-18.so*' -exec sh -c '
-        for f do
-            echo "FILE: $f"
-            readelf -d "$f" | grep NEEDED || true
-        done
-    ' sh {} \;
-
-    echo "=== LIBRARIES ==="
-    find /usr /overlayer/syshub \
-        \( -name 'libglib-2.0.so*' \
-        -o -name 'libgobject-2.0.so*' \
-        -o -name 'libgio-2.0.so*' \
-        -o -name 'libgraphene-1.0.so*' \
-        -o -name 'libEGL.so*' \) \
-        -print 2>/dev/null || true
-
-    echo "=== PKGCONFIG ==="
-    pkg-config --libs glib-2.0 || true
-    pkg-config --libs gobject-2.0 || true
-    pkg-config --libs graphene-1.0 || true
-    pkg-config --libs egl || true
-
     ninja -C builddir
+
+    DESTDIR="$(pwd)/_zexbuild-install" ninja -C builddir install
 }
 
 package() {
