@@ -7,7 +7,7 @@ pkgrel=0
 # anywhere in this package at all - bucket A, no patch needed.
 source="https://download.gnome.org/sources/evolution-data-server/3.60/evolution-data-server-$pkgver.tar.xz"
 sha256sums="2084dbdac396371b365d504c1ff45866ba8dca2f1252e5da1d3d9c33abdc1286  evolution-data-server-$pkgver.tar.xz"
-makedepends="libsecret-dev sqlite-dev glib-dev libical-dev libxml2-dev nspr-dev nss-dev libsoup3-dev json-glib-dev icu-dev zlib-dev"
+makedepends="krb5-dev libsecret-dev sqlite-dev glib-dev libical-dev libxml2-dev nspr-dev nss-dev libsoup3-dev json-glib-dev icu-dev zlib-dev"
 
 # Deps this recipe assumes, none published yet: libsecret, sqlite,
 # glib, libical, libxml2, nspr, nss, libsoup3, json-glib, icu, zlib.
