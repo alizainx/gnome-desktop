@@ -20,6 +20,17 @@ makedepends="bison boost-dev cmake flex gcr-dev glib-dev gnome-online-accounts-d
 # set to "no". Alpine doesn't set this either (no systemd.pc on their
 # system, so it auto-skips) but we set it explicitly anyway - harmless,
 # and clearer than relying on the same absence-of-systemd.pc detection.
+#
+# WITH_..._CLIENT_ID="": data/CMakeLists.txt's default (non-empty,
+# obfuscated placeholder) triggers a CHECK_C_SOURCE_RUNS that compiles
+# e-oauth2-service.c standalone and executes it during configure to
+# decode the OAuth2 URL scheme - a build-time-only helper that hits
+# the same class of problem as g-ir-scanner's dumper (see ci/build.sh's
+# bootstrap-libs comment), except silently ("Test _decoded - Failed",
+# no relocation detail). Not worth chasing further - Google/Yahoo/
+# Outlook OAuth2 branding isn't functionally required, empty strings
+# skip the whole guarded block per CMakeLists.txt's own
+# `if(NOT WITH_GOOGLE_CLIENT_ID STREQUAL "")`.
 build() {
     cmake -S . -B builddir \
         -DCMAKE_INSTALL_PREFIX=/overlayer/syshub \
@@ -34,7 +45,10 @@ build() {
         -DWITH_PHONENUMBER=ON \
         -DWITH_LIBDB=OFF \
         -DENABLE_SCHEMAS_COMPILE:BOOL=OFF \
-        -DENABLE_OAUTH2_WEBKITGTK=OFF
+        -DENABLE_OAUTH2_WEBKITGTK=OFF \
+        -DWITH_GOOGLE_CLIENT_ID="" \
+        -DWITH_YAHOO_CLIENT_ID="" \
+        -DWITH_OUTLOOK_CLIENT_ID=""
     cmake --build builddir
     DESTDIR="$(pwd)/_zexbuild-install" cmake --install builddir
 }
