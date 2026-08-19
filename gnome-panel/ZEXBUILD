@@ -27,16 +27,14 @@ makedepends="
 "
 
 build() {
-    # ZainiumOS uses elogind, not systemd.
-    # Remove GNOME's systemd scope integration from the run dialog.
-    sed -i \
-        '/#include <libgnome-desktop\/gnome-systemd\.h>/d' \
-        modules/action-button/panel-run-dialog.c
-
-    sed -i \
-        '/gnome_start_systemd_scope (locale_command,/,+2d' \
-        modules/action-button/panel-run-dialog.c
-
+    # No sed/patch against panel-run-dialog.c - Alpine's real aports
+    # recipe (community/gnome-panel) needs none, and configure.ac's own
+    # elogind detection already guards the systemd-scope code path the
+    # same way it does for Alpine's real elogind. Our earlier sed here
+    # was line-range-fragile against version bumps and is what broke
+    # the 3.58.1 build (syntax error a few lines past the deleted
+    # range) - libelogind being found by pkg-config is enough on its
+    # own, same as Alpine.
     local action_modules="gio-unix-2.0 gtk+-3.0 libgnome-menu-3.0 libelogind x11"
     local launcher_modules="gio-unix-2.0 gtk+-3.0 libgnome-menu-3.0 libelogind"
     local menu_modules="gdm gio-unix-2.0 gtk+-3.0 libgnome-menu-3.0 libelogind"
