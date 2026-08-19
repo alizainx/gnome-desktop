@@ -1,0 +1,31 @@
+# manifest.toml - gnome-browser-connector (syshub tier)
+
+[package]
+name             = "gnome-browser-connector"
+version          = "42.1"
+description      = "OS-native connector counterpart for the GNOME Shell browser integration extension"
+license          = "GPL-3.0-or-later"
+maintainer       = "Ali Zain <alizain@zainiumdynamics.tech>"
+homepage         = "https://wiki.gnome.org/Projects/GnomeShellIntegration"
+build_type       = "dynamic"
+libc_target      = "musl"
+
+blake3           = ""
+ed25519_sig      = ""
+ed25519_pubkey   = ""
+
+depends          = ["python3", "pygobject", "gnome-shell"]
+provides         = ["gnome-browser-connector"]
+tags             = ["gnome", "shell", "browser"]
+
+[install]
+bin     = "/overlayer/syshub/bin"
+share   = "/overlayer/syshub/share"
+_syshub = true
+
+[remove]
+files    = []
+dirs     = []
+symlinks = []
+
+[hooks]
