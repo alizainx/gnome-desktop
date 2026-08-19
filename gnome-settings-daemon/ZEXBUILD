@@ -43,7 +43,6 @@ build() {
         -Dnetwork_manager=true \
         -Drfkill=true \
         -Dsmartcard=false \
-        -Dx11=false \
         -Dxwayland=false \
         -Dwwan=false
 
