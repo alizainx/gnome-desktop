@@ -1,0 +1,31 @@
+# manifest.toml - libgweather (syshub tier)
+
+[package]
+name             = "libgweather"
+version          = "4.4.4"
+description      = "Location and timezone database and weather-lookup library"
+license          = "GPL-2.0-or-later"
+maintainer       = "Ali Zain <alizain@zainiumdynamics.tech>"
+homepage         = "https://gitlab.gnome.org/GNOME/libgweather"
+build_type       = "dynamic"
+libc_target      = "musl"
+
+blake3           = ""
+ed25519_sig      = ""
+ed25519_pubkey   = ""
+
+depends          = ["glib", "libsoup3", "geocode-glib", "libxml2", "json-glib"]
+provides         = ["libgweather-4.so"]
+tags             = ["gnome", "weather", "library"]
+
+[install]
+lib     = "/overlayer/syshub/lib"
+share   = "/overlayer/syshub/share"
+_syshub = true
+
+[remove]
+files    = []
+dirs     = []
+symlinks = []
+
+[hooks]
