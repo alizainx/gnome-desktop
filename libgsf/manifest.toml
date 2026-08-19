@@ -1,0 +1,32 @@
+# manifest.toml - libgsf (syshub tier)
+
+[package]
+name             = "libgsf"
+version          = "1.14.58"
+description      = "GNOME structured file library (OLE2/ZIP container reading and writing)"
+license          = "LGPL-2.1-only"
+maintainer       = "Ali Zain <alizain@zainiumdynamics.tech>"
+homepage         = "https://gitlab.gnome.org/GNOME/libgsf"
+build_type       = "dynamic"
+libc_target      = "musl"
+
+blake3           = ""
+ed25519_sig      = ""
+ed25519_pubkey   = ""
+
+depends          = ["glib", "libxml2", "zlib"]
+provides         = ["libgsf-1.so"]
+tags             = ["gnome", "storage", "library"]
+
+[install]
+bin     = "/overlayer/syshub/bin"
+lib     = "/overlayer/syshub/lib"
+share   = "/overlayer/syshub/share"
+_syshub = true
+
+[remove]
+files    = []
+dirs     = []
+symlinks = []
+
+[hooks]
