@@ -37,7 +37,7 @@ build() {
         --prefix=/overlayer/syshub \
         --libdir=/overlayer/syshub/lib \
         --includedir=/overlayer/syshub/include \
-        --localstatedir=/var \
+        --localstatedir=/overlayer/syshub/var \
         -Ddefault-pam-config=exherbo \
         -Dgdm-xsession=true \
         -Dgroup=gdm \
@@ -47,7 +47,6 @@ build() {
         -Drun-dir=/run/gdm \
         -Dselinux=disabled \
         -Dsystemd-journal=false \
-        -Duser=gdm \
         -Duser-display-server=true \
         -Dx11-support=true \
         -Dxdmcp=disabled \
