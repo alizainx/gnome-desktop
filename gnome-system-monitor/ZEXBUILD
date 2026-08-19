@@ -10,10 +10,12 @@ pkgrel=0
 source="https://download.gnome.org/sources/gnome-system-monitor/50/gnome-system-monitor-$pkgver.tar.xz"
 sha256sums="a4138aa754b4584c46de91fad1d685e27b12bc2457de761863b6be02d84c4862  gnome-system-monitor-$pkgver.tar.xz"
 
-# Matches Alpine's real makedepends, minus catch2-3 (test-only, we
-# don't run meson test) plus libxml2-utils/libxslt which Alpine lists
-# separately from libxml2-dev.
-makedepends="glibmm-dev gnome-desktop-dev gtkmm4-dev itstool libadwaita-dev libgtop-dev librsvg-dev libxml2-dev libxml2-utils libxslt polkit-dev"
+# Matches Alpine's real makedepends verbatim now - catch2-3 turned
+# out to be a hard meson.build dependency() call, not test-only as
+# first assumed (fails at configure time regardless of whether meson
+# test ever runs). libxml2-utils/libxslt added too, which Alpine
+# lists separately from libxml2-dev.
+makedepends="catch2-3 glibmm-dev gnome-desktop-dev gtkmm4-dev itstool libadwaita-dev libgtop-dev librsvg-dev libxml2-dev libxml2-utils libxslt polkit-dev"
 
 build() {
     # localtime_r needs _BSD_SOURCE on musl - same CFLAGS Alpine's own
