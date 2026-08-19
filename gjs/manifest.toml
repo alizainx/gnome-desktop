@@ -1,0 +1,32 @@
+# manifest.toml - gjs (syshub tier)
+
+[package]
+name             = "gjs"
+version          = "1.88.1"
+description      = "Javascript bindings for GNOME (SpiderMonkey + GObject introspection)"
+license          = "MIT"
+maintainer       = "Ali Zain <alizain@zainiumdynamics.tech>"
+homepage         = "https://gjs.guide"
+build_type       = "dynamic"
+libc_target      = "musl"
+
+blake3           = ""
+ed25519_sig      = ""
+ed25519_pubkey   = ""
+
+depends          = ["glib", "libffi", "gobject-introspection", "spidermonkey", "cairo"]
+provides         = ["gjs", "libgjs.so.0"]
+tags             = ["gnome", "javascript", "bindings"]
+
+[install]
+bin     = "/overlayer/syshub/bin"
+lib     = "/overlayer/syshub/lib"
+share   = "/overlayer/syshub/share"
+_syshub = true
+
+[remove]
+files    = []
+dirs     = []
+symlinks = []
+
+[hooks]
