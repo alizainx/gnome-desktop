@@ -1,7 +1,47 @@
+maintainer="Ali Zain <alizain@zainiumdynamics.tech>"
+
+pkgname=gnome-shell
+pkgver=50.4
+pkgrel=0
+
+source="https://download.gnome.org/sources/gnome-shell/50/gnome-shell-$pkgver.tar.xz
+0001-shell-elogind-support-to-avoid-stubbed-sd_notify.patch"
+
+sha256sums="c531939539db316a41aef23670370abd1330d3254f84bcb0f9f4dae5d6e362cf  gnome-shell-$pkgver.tar.xz"
+
+makedepends="
+    elogind-dev
+    mutter-dev
+    evolution-data-server-dev
+    gcr4-dev
+    gjs-dev
+    gnome-autoar-dev
+    gnome-desktop-dev
+    gobject-introspection-dev
+    gstreamer-dev
+    gtk4.0-dev
+    ibus-dev
+    json-glib-dev
+    libcanberra-dev
+    libxml2-dev
+    libx11-dev
+    libxext-dev
+    libxfixes-dev
+    pipewire-dev
+    polkit-dev
+    pulseaudio-dev
+    sassc
+    startup-notification-dev
+"
+
 build() {
     patch -p1 < ../0001-shell-elogind-support-to-avoid-stubbed-sd_notify.patch
 
-    export LD_LIBRARY_PATH="/overlayer/syshub/lib:/usr/lib:/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
+    export PKG_CONFIG_PATH="/overlayer/syshub/lib/pkgconfig:/overlayer/syshub/share/pkgconfig${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}"
+
+    export GI_TYPELIB_PATH="/overlayer/syshub/lib/girepository-1.0:/overlayer/syshub/share/girepository-1.0${GI_TYPELIB_PATH:+:$GI_TYPELIB_PATH}"
+
+    export XDG_DATA_DIRS="/overlayer/syshub/share${XDG_DATA_DIRS:+:$XDG_DATA_DIRS}"
 
     meson setup builddir \
         --prefix=/overlayer/syshub \
@@ -21,4 +61,11 @@ build() {
 
     DESTDIR="$(pwd)/_zexbuild-install" \
         ninja -C builddir install
+}
+
+package() {
+    local inst="_zexbuild-install/overlayer/syshub"
+
+    mkdir -p "$PAYLOAD_DIR"
+    cp -a "$inst"/. "$PAYLOAD_DIR"/
 }
