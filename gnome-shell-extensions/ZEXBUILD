@@ -1,0 +1,37 @@
+maintainer="Ali Zain <alizain@zainiumdynamics.tech>"
+pkgname=gnome-shell-extensions
+pkgver=49.0
+pkgrel=0
+# Meson, no language declared - pure JS/data, the official bundle of
+# built-in-style extensions (window-list, workspace-indicator, etc).
+# No systemd/elogind touchpoint. -Dx11=false matches every other
+# recipe here that drops X11 support (gnome-settings-daemon, gvfs, ...).
+source="https://download.gnome.org/sources/gnome-shell-extensions/49/gnome-shell-extensions-$pkgver.tar.xz"
+sha256sums="1570e064786cb4389759e0483f3a1bdbd5b9b38f06246eb4d1d509292a9c6a62  gnome-shell-extensions-$pkgver.tar.xz"
+makedepends="glib-dev gjs-dev gobject-introspection-dev gnome-menus-dev libadwaita-dev graphene-dev gtk4.0-dev pango-dev mutter-dev libgtop-dev gettext-dev sassc"
+
+# Deps this recipe assumes, none published yet: glib, gjs,
+# gobject-introspection, gnome-menus, gnome-shell, libadwaita, graphene,
+# gtk4, pango, mutter, libgtop.
+build() {
+    meson setup builddir \
+        --prefix=/overlayer/syshub \
+        --libdir=/overlayer/syshub/lib \
+        --includedir=/overlayer/syshub/include \
+        -Dextension_set=all \
+        -Dclassic_mode=true \
+        -Dx11=false
+    ninja -C builddir
+    DESTDIR="$(pwd)/_zexbuild-install" ninja -C builddir install
+
+    # gnome.post_install(glib_compile_schemas: true) compiles straight
+    # into DESTDIR - drop it, same reasoning as the other meson-based
+    # extension recipes here.
+    rm -f "_zexbuild-install/overlayer/syshub/share/glib-2.0/schemas/gschemas.compiled"
+}
+
+package() {
+    local inst="_zexbuild-install/overlayer/syshub"
+    mkdir -p "$PAYLOAD_DIR"
+    cp -a "$inst"/. "$PAYLOAD_DIR"/
+}
