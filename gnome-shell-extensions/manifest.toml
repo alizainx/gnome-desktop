@@ -1,0 +1,30 @@
+# manifest.toml - gnome-shell-extensions (syshub tier)
+
+[package]
+name             = "gnome-shell-extensions"
+version          = "49.0"
+description      = "Official bundle of JavaScript extensions for GNOME Shell"
+license          = "GPL-2.0-or-later"
+maintainer       = "Ali Zain <alizain@zainiumdynamics.tech>"
+homepage         = "https://gitlab.gnome.org/GNOME/gnome-shell-extensions"
+build_type       = "dynamic"
+libc_target      = "musl"
+
+blake3           = ""
+ed25519_sig      = ""
+ed25519_pubkey   = ""
+
+depends          = ["glib", "gjs", "gobject-introspection", "gnome-menus", "gnome-shell", "libadwaita", "graphene", "gtk4", "pango", "mutter", "libgtop"]
+provides         = ["gnome-shell-extensions"]
+tags             = ["gnome", "shell", "extension"]
+
+[install]
+share   = "/overlayer/syshub/share"
+_syshub = true
+
+[remove]
+files    = []
+dirs     = []
+symlinks = []
+
+[hooks]
