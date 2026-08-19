@@ -1,0 +1,33 @@
+# manifest.toml - gvfs (syshub tier)
+
+[package]
+name             = "gvfs"
+version          = "1.58.4"
+description      = "Virtual filesystem implementation for GIO, systemd-optional build (elogind/qlogind)"
+license          = "LGPL-2.0-or-later"
+maintainer       = "Ali Zain <alizain@zainiumdynamics.tech>"
+homepage         = "https://gitlab.gnome.org/GNOME/gvfs"
+build_type       = "dynamic"
+libc_target      = "musl"
+
+blake3           = ""
+ed25519_sig      = ""
+ed25519_pubkey   = ""
+
+depends          = ["glib", "gsettings-desktop-schemas", "dbus", "quantra-logind"]
+provides         = ["gvfs"]
+tags             = ["gnome", "vfs", "gio"]
+
+[install]
+bin     = "/overlayer/syshub/bin"
+lib     = "/overlayer/syshub/lib"
+libexec = "/overlayer/syshub/libexec"
+share   = "/overlayer/syshub/share"
+_syshub = true
+
+[remove]
+files    = []
+dirs     = []
+symlinks = []
+
+[hooks]

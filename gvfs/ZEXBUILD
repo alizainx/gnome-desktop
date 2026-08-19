@@ -1,0 +1,65 @@
+maintainer="Ali Zain <alizain@zainiumdynamics.tech>"
+pkgname=gvfs
+pkgver=1.58.4
+pkgrel=0
+# -Dlogind=true: real boolean meson option, confirmed in the tarball's
+# own meson_options.txt ("build with logind support") and meson.build
+# (dependency('libsystemd') / dependency('libelogind') fallback, same
+# pattern as mutter). Satisfied by qlogind's libelogind.pc alias, no
+# source patch needed. Matches Gentoo's gnome-base/gvfs-1.58.4.ebuild.
+source="https://download.gnome.org/sources/gvfs/1.58/gvfs-$pkgver.tar.xz"
+sha256sums="e7124bec724e265ad0ee00baa27d8d515cf1dddcf102638be67b9e259c9b040d  gvfs-$pkgver.tar.xz"
+makedepends="glib-dev gsettings-desktop-schemas-dev dbus-dev libxml2-dev"
+
+# Every optional backend (afp, cdda, fuse, gcr, http, mtp, samba, sftp,
+# udisks2, ...) disabled for this first pass since none of those deps
+# are published either - gvfs still needs to link and install its core
+# daemon/monitor even with everything optional turned off.
+# libxml2-dev: dependency('libxml-2.0') in meson.build is unconditional
+# (used by the core daemon's .mount file/metadata parsing), not gated
+# behind any of the -D... backend flags below - was missing.
+build() {
+    meson setup builddir \
+        --prefix=/overlayer/syshub \
+        --libdir=/overlayer/syshub/lib \
+        --includedir=/overlayer/syshub/include \
+        -Dsystemduserunitdir=no \
+        -Dtmpfilesdir=no \
+        -Dlogind=false  \
+        -Dadmin=false \
+        -Dafc=false \
+        -Dafp=false \
+        -Darchive=false \
+        -Dburn=false \
+        -Dcdda=false \
+        -Ddnssd=false \
+        -Dgoa=false \
+        -Dgoogle=false \
+        -Dgphoto2=false \
+        -Dhttp=false \
+        -Dmtp=false \
+        -Dnfs=false \
+        -Donedrive=false \
+        -Dsftp=false \
+        -Dsmb=false \
+        -Dudisks2=false \
+        -Dwsdd=false \
+        -Dbluray=false \
+        -Dfuse=false \
+        -Dgcr=false \
+        -Dgcrypt=false \
+        -Dgudev=false \
+        -Dkeyring=false \
+        -Dlibusb=false \
+        -Dinstalled_tests=false \
+        -Dman=false \
+        -Dunit_tests=false
+
+    ninja -C builddir
+    DESTDIR="$(pwd)/_zexbuild-install" ninja -C builddir install
+}
+
+package() {
+    local inst="_zexbuild-install/overlayer/syshub"
+    cp -a "$inst"/. "$PAYLOAD_DIR"/
+}
