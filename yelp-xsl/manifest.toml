@@ -1,0 +1,30 @@
+# manifest.toml - yelp-xsl (syshub tier)
+
+[package]
+name             = "yelp-xsl"
+version          = "49.0"
+description      = "XSL stylesheets and data files used by yelp"
+license          = "GPL-2.0-or-later"
+maintainer       = "Ali Zain <alizain@zainiumdynamics.tech>"
+homepage         = "https://gitlab.gnome.org/GNOME/yelp-xsl"
+build_type       = "dynamic"
+libc_target      = "musl"
+
+blake3           = ""
+ed25519_sig      = ""
+ed25519_pubkey   = ""
+
+depends          = []
+provides         = ["yelp-xsl"]
+tags             = ["gnome", "help", "data"]
+
+[install]
+share   = "/overlayer/syshub/share"
+_syshub = true
+
+[remove]
+files    = []
+dirs     = []
+symlinks = []
+
+[hooks]
