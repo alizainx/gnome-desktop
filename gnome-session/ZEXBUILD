@@ -1,0 +1,46 @@
+maintainer="Ali Zain <alizain@zainiumdynamics.tech>"
+pkgname=gnome-session
+pkgver=49.3
+pkgrel=0
+# 0001-make-systemd-optional.patch: real upstream-style patch (Swagtoy,
+# already carried by Gentoo's gnome-session-49.3 ebuild), adds a
+# meson `systemd` option. With -Dsystemd=false it drops the hard
+# libsystemd/systemd-userunitdir dependency and depends on
+# `libelogind` (>=209) instead via plain dependency('libelogind') -
+# satisfied by qlogind's libelogind.pc alias, no source patch needed
+# for that part.
+source="https://download.gnome.org/sources/gnome-session/49/gnome-session-$pkgver.tar.xz
+0001-make-systemd-optional.patch"
+sha256sums="b424a90cfe51de4941b791a5102aeaadb2c62c185522a21f71cb485270053fe1  gnome-session-$pkgver.tar.xz"
+# elogind-dev/libsm-dev/json-glib-dev/gtk+3.0-dev/upower-dev/itstool
+# copied from Alpine's own real gnome-session APKBUILD makedepends
+# (verified against aports) minus the docbook/xmlto man-page toolchain,
+# since -Dman=false/-Ddocbook=false here.
+makedepends="elogind-dev gnome-desktop-dev gnome-settings-daemon-dev gtk+3.0-dev itstool json-glib-dev libsm-dev upower-dev"
+
+# Deps this recipe assumes, none published yet: glib (userland-recipes,
+# in progress), gnome-desktop:4, gsettings-desktop-schemas,
+# gnome-settings-daemon, dbus, xdg-user-dirs, xdg-user-dirs-gtk, and
+# qlogind's libelogind.pc alias (quantra-logind, in progress).
+# gnome-session will not configure until these exist.
+build() {
+    patch -p1 < ../0001-make-systemd-optional.patch
+
+    meson setup builddir \
+        --prefix=/overlayer/syshub \
+        --libdir=/overlayer/syshub/lib \
+        --includedir=/overlayer/syshub/include \
+        -Ddeprecation_flags=false \
+        -Ddocbook=false \
+        -Dman=false \
+        -Dsystemd=false \
+        -Dx11=true
+    ninja -C builddir
+    DESTDIR="$(pwd)/_zexbuild-install" ninja -C builddir install
+}
+
+package() {
+    local inst="_zexbuild-install/overlayer/syshub"
+    mkdir -p "$PAYLOAD_DIR"
+    cp -a "$inst"/. "$PAYLOAD_DIR"/
+}
