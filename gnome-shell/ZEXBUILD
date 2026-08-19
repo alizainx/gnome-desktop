@@ -1,0 +1,108 @@
+maintainer="Ali Zain <alizain@zainiumdynamics.tech>"
+
+pkgname=gnome-shell
+pkgver=50.4
+pkgrel=0
+
+source="https://download.gnome.org/sources/gnome-shell/50/gnome-shell-$pkgver.tar.xz
+0001-shell-elogind-support-to-avoid-stubbed-sd_notify.patch"
+
+sha256sums="c531939539db316a41aef23670370abd1330d3254f84bcb0f9f4dae5d6e362cf  gnome-shell-$pkgver.tar.xz"
+
+makedepends="
+    elogind-dev
+    evolution-data-server-dev
+    gcr4-dev
+    gjs-dev
+    gnome-autoar-dev
+    gnome-desktop-dev
+    gobject-introspection-dev
+    gstreamer-dev
+    gtk4.0-dev
+    ibus-dev
+    json-glib-dev
+    libcanberra-dev
+    libxml2-dev
+    libx11-dev
+    libxext-dev
+    libxfixes-dev
+    pipewire-dev
+    polkit-dev
+    pulseaudio-dev
+    sassc
+    startup-notification-dev
+"
+
+build() {
+    patch -p1 < ../0001-shell-elogind-support-to-avoid-stubbed-sd_notify.patch
+
+    # mutter isn't published to the toolchain ledger yet - it's our own
+    # recipe already sitting on master, built the same way any package
+    # is: run ci/build.sh on it (same script, recursively) from the
+    # repo root ($OUT_DIR - a plain, unexported var from the outer
+    # build.sh invocation, visible here since ZEXBUILD is sourced into
+    # that same shell), then unpack the .zex it produces straight into
+    # /overlayer/syshub so gnome-shell links against our real musl
+    # mutter instead of Alpine's apk mutter-dev.
+    echo "-- building mutter first (not published yet, bundled here) --"
+    ( cd "$OUT_DIR" && sh ci/build.sh mutter )
+    "${SUBSTRATE:-substrate}" unpack "$OUT_DIR"/mutter-*.zex --output /overlayer/syshub
+
+    export PKG_CONFIG_PATH="/overlayer/syshub/lib/pkgconfig:/overlayer/syshub/share/pkgconfig:${PKG_CONFIG_PATH:-}"
+    export GI_TYPELIB_PATH="/overlayer/syshub/lib/girepository-1.0:/overlayer/syshub/share/girepository-1.0:${GI_TYPELIB_PATH:-}"
+    export XDG_DATA_DIRS="/overlayer/syshub/share:${XDG_DATA_DIRS:-/usr/share}"
+
+    # Build-time introspection binaries such as St-18 must run
+    # against Alpine's build environment libraries.
+    export LD_LIBRARY_PATH="/usr/lib:/lib:${LD_LIBRARY_PATH:-}"
+
+    meson setup builddir \
+        --prefix=/overlayer/syshub \
+        --libdir=/overlayer/syshub/lib \
+        --includedir=/overlayer/syshub/include \
+        -Dsystemd=false \
+        -Dcamera_monitor=false \
+        -Dextensions_tool=true \
+        -Dextensions_app=true \
+        -Dgtk_doc=false \
+        -Dman=false \
+        -Dtests=false \
+        -Dnetworkmanager=false \
+        -Dportal_helper=false \
+        --strip
+
+    ninja -C builddir
+
+    DESTDIR="$(pwd)/_zexbuild-install" \
+        ninja -C builddir install
+}
+
+package() {
+    local inst="_zexbuild-install/overlayer/syshub"
+
+    mkdir -p "$PAYLOAD_DIR"
+    cp -a "$inst"/. "$PAYLOAD_DIR"/
+
+    # ZainiumOS has no /usr hierarchy. --strip (above) handles the
+    # compiled .so's debug-info /usr/include/... remnants; everything
+    # else left with a literal /usr/ reference at this point is a text
+    # file gnome-shell's build baked Alpine/FHS paths into (D-Bus
+    # service Exec= lines, gjs/python3 shebangs on installed scripts,
+    # perf-background.xml's stock wallpaper path) - blanket-rewrite
+    # every text file's /usr/ to /overlayer/syshub/ rather than chase
+    # each one by name.
+    grep -RIl '/usr/' "$PAYLOAD_DIR" 2>/dev/null | while IFS= read -r f; do
+        sed -i 's#/usr/#/overlayer/syshub/#g' "$f"
+    done
+
+    # Verify that no forbidden /usr references remain in payload text.
+    # (--strip on the meson setup above removes the debug-info string
+    # tables that used to trip this on Alpine -dev headers' own
+    # /usr/include/... paths - real, no-op-at-runtime remnants of
+    # compiling against apk -dev packages, not actual link-time deps.)
+    if grep -RIl '/usr/' "$PAYLOAD_DIR" 2>/dev/null | head -1 | grep -q .; then
+        echo "ERROR: forbidden /usr reference remains in payload"
+        grep -RIn '/usr/' "$PAYLOAD_DIR" 2>/dev/null || true
+        return 1
+    fi
+}

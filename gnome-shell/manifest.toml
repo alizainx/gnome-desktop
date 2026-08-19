@@ -1,0 +1,33 @@
+# manifest.toml - gnome-shell (syshub tier)
+
+[package]
+name             = "gnome-shell"
+version          = "49.9"
+description      = "GNOME Shell, systemd-optional build (elogind/qlogind)"
+license          = "GPL-2.0-or-later"
+maintainer       = "Ali Zain <alizain@zainiumdynamics.tech>"
+homepage         = "https://gitlab.gnome.org/GNOME/gnome-shell"
+build_type       = "dynamic"
+libc_target      = "musl"
+
+blake3           = ""
+ed25519_sig      = ""
+ed25519_pubkey   = ""
+
+depends          = ["glib", "gtk4", "gnome-desktop", "mutter", "gjs", "gnome-autoar", "json-glib", "quantra-logind"]
+provides         = ["gnome-shell"]
+tags             = ["gnome", "desktop", "shell"]
+
+[install]
+bin     = "/overlayer/syshub/bin"
+lib     = "/overlayer/syshub/lib"
+libexec = "/overlayer/syshub/libexec"
+share   = "/overlayer/syshub/share"
+_syshub = true
+
+[remove]
+files    = []
+dirs     = []
+symlinks = []
+
+[hooks]
