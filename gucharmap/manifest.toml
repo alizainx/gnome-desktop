@@ -1,0 +1,32 @@
+# manifest.toml - gucharmap (syshub tier)
+
+[package]
+name             = "gucharmap"
+version          = "17.0.2"
+description      = "Unicode character map viewer and library"
+license          = "GPL-3.0-or-later"
+maintainer       = "Ali Zain <alizain@zainiumdynamics.tech>"
+homepage         = "https://gitlab.gnome.org/GNOME/gucharmap"
+build_type       = "dynamic"
+libc_target      = "musl"
+
+blake3           = ""
+ed25519_sig      = ""
+ed25519_pubkey   = ""
+
+depends          = ["freetype", "glib", "gtk3", "libpcre2", "unicode-data", "pango", "cairo", "at-spi2-core"]
+provides         = ["gucharmap"]
+tags             = ["gnome", "unicode", "gui"]
+
+[install]
+bin     = "/overlayer/syshub/bin"
+lib     = "/overlayer/syshub/lib"
+share   = "/overlayer/syshub/share"
+_syshub = true
+
+[remove]
+files    = []
+dirs     = []
+symlinks = []
+
+[hooks]
