@@ -23,7 +23,7 @@ pkgrel=0
 # reflects that.
 source="https://download.gnome.org/sources/gnome-control-center/50/gnome-control-center-$pkgver.tar.xz"
 sha256sums="5856c73999bedf45e74f73bac3d61e2b5ec1689f8bcf1943737baeee8204fb11  gnome-control-center-$pkgver.tar.xz"
-makedepends="glib-dev gtk4.0-dev libadwaita-dev accountsservice-dev colord-dev gdk-pixbuf-dev gnome-desktop-dev gsettings-desktop-schemas-dev libxml2-dev upower-dev libgudev-dev gcr4-dev libpwquality-dev polkit-dev cairo-dev fontconfig-dev libgtop-dev udisks2-dev libsecret-dev gnutls-dev gsound-dev pango-dev networkmanager-dev libnma-dev gnome-bluetooth-dev krb5-dev libwacom-dev cups-dev samba-dev gnome-online-accounts-dev libepoxy-dev json-glib-dev pulseaudio-dev gnome-settings-daemon-dev tecla-dev modemmanager-dev gettext blueprint-compiler"
+makedepends="glib-dev gtk4.0-dev libadwaita-dev accountsservice-dev colord-dev colord-gtk4 gdk-pixbuf-dev gnome-desktop-dev gsettings-desktop-schemas-dev libxml2-dev upower-dev libgudev-dev gcr4-dev libpwquality-dev polkit-dev cairo-dev fontconfig-dev libgtop-dev udisks2-dev libsecret-dev gnutls-dev gsound-dev pango-dev networkmanager-dev libnma-dev gnome-bluetooth-dev krb5-dev libwacom-dev cups-dev samba-dev gnome-online-accounts-dev libepoxy-dev json-glib-dev pulseaudio-dev gnome-settings-daemon-dev tecla-dev modemmanager-dev gettext blueprint-compiler"
 
 # Deps this recipe assumes, none published yet: glib, gtk4, libadwaita,
 # accountsservice, colord, gdk-pixbuf, gnome-desktop, gsettings-desktop-schemas,
