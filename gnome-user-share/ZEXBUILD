@@ -33,7 +33,8 @@ build() {
         --includedir=/overlayer/syshub/include \
         -Dsystemduserunitdir=/overlayer/syshub/lib/systemd/user \
         -Dhttpd=/overlayer/syshub/sbin/httpd \
-        -Dmodules_path=/overlayer/syshub/lib/apache2
+        -Dmodules_path=/overlayer/syshub/lib/apache2 \
+        --strip
     ninja -C builddir
     DESTDIR="$(pwd)/_zexbuild-install" ninja -C builddir install
 }
@@ -47,7 +48,18 @@ package() {
     # -Dmodules_path only covers the apache module path, not this
     # config template. substrate's own payload check rejects any
     # /usr text reference regardless of source.
+    #
+    # gnome-user-share-webdav (a real ELF binary) also matched this
+    # grep - its RPATH or debug info apparently contains a literal
+    # "/usr/" substring, and grep -I doesn't reliably treat every ELF
+    # as binary. sed -i rewriting it changed its total byte length,
+    # shifting every offset after the match and leaving a corrupt ELF
+    # ("'.shstrtab section out of bounds'" from substrate's own patch
+    # step). Skip anything with the ELF magic explicitly - same check
+    # ci/build.sh's own verify_musl()/fix_interpreter() use.
     grep -RIl '/usr/' "$PAYLOAD_DIR" 2>/dev/null | while IFS= read -r f; do
+        magic="$(od -An -tx1 -N4 "$f" 2>/dev/null | tr -d ' \n')"
+        [ "$magic" = "7f454c46" ] && continue
         sed -i 's#/usr/#/overlayer/syshub/#g' "$f"
     done
 }
