@@ -2,28 +2,14 @@ maintainer="Ali Zain <alizain@zainiumdynamics.tech>"
 pkgname=gnome-panel
 pkgver=3.58.1
 pkgrel=0
-# Autotools, not meson - confirmed against the real tarball. Same
-# situation as gnome-flashback: configure.ac's PKG_CHECK_MODULES for
-# ACTION_BUTTON/LAUNCHER/MENU each hardcode "libsystemd" literally,
-# with no elogind fallback in configure.ac itself. Pre-computing
-# <VAR>_CFLAGS/<VAR>_LIBS against "libelogind" and feeding them into
-# configure bypasses the pkg-config check entirely - same technique
-# Gentoo's own ebuild uses, no source patch needed. Module lists
-# copied verbatim from the ebuild's src_configure().
-source="https://download.gnome.org/sources/gnome-panel/3.58/gnome-panel-$pkgver.tar.xz
-0001-drop-unused-gnome-systemd-include.patch"
+
+source="https://download.gnome.org/sources/gnome-panel/3.58/gnome-panel-$pkgver.tar.xz"
+
 sha256sums="7e8bca43a81a134c666b3a78baf2affb0c5d30efb1bca653887fc41b31dd5e64  gnome-panel-$pkgver.tar.xz"
-makedepends="itstool glib-dev gnome-desktop-dev gdk-pixbuf-dev pango-dev gtk+3.0-dev libwnck3-dev gnome-menus-dev gsettings-desktop-schemas-dev cairo-dev libgweather4-dev dconf-dev libx11-dev gdm-dev geocode-glib-dev polkit-dev"
 
-# Deps this recipe assumes, none published yet: gnome-desktop,
-# gdk-pixbuf, pango, glib, gtk3, libwnck, gnome-menus,
-# gsettings-desktop-schemas, cairo, libgweather, dconf, libX11 family,
-# gdm, geocode-glib, polkit. eds (evolution-data-server) support
-# disabled for this first pass. gnome-panel will not configure until
-# these exist.
+makedepends="itstool glib-dev gnome-desktop-dev gdk-pixbuf-dev pango-dev gtk+3.0-dev libwnck3-dev gnome-menus-dev gsettings-desktop-schemas-dev cairo-dev libgweather4-dev dconf-dev libx11-dev gdm-dev geocode-glib-dev polkit-dev elogind-dev"
+
 build() {
-    patch -p1 < ../0001-drop-unused-gnome-systemd-include.patch
-
     local action_modules="gio-unix-2.0 gtk+-3.0 libgnome-menu-3.0 libelogind x11"
     local launcher_modules="gio-unix-2.0 gtk+-3.0 libgnome-menu-3.0 libelogind"
     local menu_modules="gdm gio-unix-2.0 gtk+-3.0 libgnome-menu-3.0 libelogind"
@@ -47,6 +33,7 @@ build() {
 
 package() {
     local inst="_zexbuild-install/overlayer/syshub"
+
     mkdir -p "$PAYLOAD_DIR"
     cp -a "$inst"/. "$PAYLOAD_DIR"/
 }
