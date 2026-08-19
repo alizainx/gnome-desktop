@@ -1,0 +1,32 @@
+# manifest.toml - librsvg (syshub tier)
+
+[package]
+name             = "librsvg"
+version          = "2.62.3"
+description      = "SVG rendering library (Rust), also ships rsvg-convert and the gdk-pixbuf SVG loader"
+license          = "LGPL-2.1-or-later"
+maintainer       = "Ali Zain <alizain@zainiumdynamics.tech>"
+homepage         = "https://gitlab.gnome.org/GNOME/librsvg"
+build_type       = "dynamic"
+libc_target      = "musl"
+
+blake3           = ""
+ed25519_sig      = ""
+ed25519_pubkey   = ""
+
+depends          = ["cairo", "freetype", "gdk-pixbuf", "glib", "harfbuzz", "libgsf", "libxml2", "pango"]
+provides         = ["librsvg-2.so", "rsvg-convert"]
+tags             = ["gnome", "svg", "rendering", "rust"]
+
+[install]
+bin     = "/overlayer/syshub/bin"
+lib     = "/overlayer/syshub/lib"
+share   = "/overlayer/syshub/share"
+_syshub = true
+
+[remove]
+files    = []
+dirs     = []
+symlinks = []
+
+[hooks]
