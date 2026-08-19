@@ -1,0 +1,38 @@
+maintainer="Ali Zain <alizain@zainiumdynamics.tech>"
+pkgname=gnome-desktop
+pkgver=44.5
+pkgrel=0
+
+# Rewritten to mirror Alpine's real aports recipe (community/gnome-desktop)
+# as closely as possible - same makedepends, same meson flags. systemd
+# option doesn't even appear there (it's not a dependency this package
+# has at all), so no -Dsystemd flag needed either way.
+source="https://download.gnome.org/sources/gnome-desktop/44/gnome-desktop-$pkgver.tar.xz"
+sha256sums="20e0995a6e3a03e8c1026c5a27bc3f45e69ffcc392ad743dcab6107a541d232f  gnome-desktop-$pkgver.tar.xz"
+makedepends="gobject-introspection-dev gsettings-desktop-schemas-dev eudev-dev fontconfig-dev gdk-pixbuf-dev glib-dev gtk+3.0-dev gtk4.0-dev iso-codes-dev itstool libseccomp-dev libxml2-utils meson xkeyboard-config-dev"
+
+# GnomeDesktop-4.0's own g-ir-scanner dumper carries Zainium's own
+# interpreter/rpath like every other build product (same class of
+# problem as gnome-shell's St-18 dumper) and needs to actually run
+# against real glib/etc during the build - point it at Alpine's real,
+# fully-linked system libs instead of Zainium's target-only tree.
+build() {
+    export LD_LIBRARY_PATH="/usr/lib:/lib:${LD_LIBRARY_PATH:-}"
+
+    meson setup builddir \
+        --prefix=/overlayer/syshub \
+        --libdir=/overlayer/syshub/lib \
+        --includedir=/overlayer/syshub/include \
+        -Dudev=enabled \
+        -Dbuild_gtk4=true \
+        -Dlegacy_library=true \
+        --strip
+    ninja -C builddir
+    DESTDIR="$(pwd)/_zexbuild-install" ninja -C builddir install
+}
+
+package() {
+    local inst="_zexbuild-install/overlayer/syshub"
+    mkdir -p "$PAYLOAD_DIR"
+    cp -a "$inst"/. "$PAYLOAD_DIR"/
+}
