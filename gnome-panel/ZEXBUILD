@@ -27,24 +27,26 @@ makedepends="
 "
 
 build() {
-    # panel-run-dialog.c hard-#includes <libgnome-desktop/gnome-systemd.h>
-    # and calls gnome_start_systemd_scope() unconditionally, no
-    # HAVE_ELOGIND-style guard - this header isn't present in this CI
-    # container's gnome-desktop-dev, so it must go. Checked against the
-    # actual downloaded 3.58.1 tarball: the call is exactly 7 lines,
-    # match line through "NULL);":
-    #   gnome_start_systemd_scope (locale_command,
-    #                              pid, NULL, NULL, NULL, NULL, NULL);
-    # `+7d` (used twice before) deletes 8 lines - match + 7 - eating
-    # the blank line *and* the enclosing block's closing brace right
-    # after, which is what actually caused the cascading "invalid
-    # storage class" errors from that point to EOF. `+6d` deletes
-    # exactly match + 6 continuation lines = the whole statement, no
-    # more.
-    sed -i '/#include <libgnome-desktop\/gnome-systemd\.h>/d' \
-        modules/action-button/panel-run-dialog.c
-    sed -i '/gnome_start_systemd_scope (locale_command,/,+6d' \
-        modules/action-button/panel-run-dialog.c
+    # 3 files hard-#include <libgnome-desktop/gnome-systemd.h> and call
+    # gnome_start_systemd_scope() unconditionally, no HAVE_ELOGIND-style
+    # guard - checked the actual downloaded 3.58.1 tarball with grep -rl,
+    # not just the one file that happened to fail first:
+    #   modules/menu/gp-menu-utils.c
+    #   modules/launcher/gp-launcher-applet.c
+    #   modules/action-button/panel-run-dialog.c
+    # This header isn't present in this CI container's gnome-desktop-dev,
+    # so it must go in all three. Each call is exactly 7 lines, match
+    # line through "NULL);" - verified against the tarball, brace count
+    # balanced after removal for each file. `+6d` (match + 6 more) is
+    # the whole statement; a previous `+7d` attempt ate the enclosing
+    # block's closing brace instead, corrupting one of these files.
+    for f in modules/menu/gp-menu-utils.c \
+             modules/launcher/gp-launcher-applet.c \
+             modules/action-button/panel-run-dialog.c
+    do
+        sed -i '/#include <libgnome-desktop\/gnome-systemd\.h>/d' "$f"
+        sed -i '/gnome_start_systemd_scope (/,+6d' "$f"
+    done
 
     local action_modules="gio-unix-2.0 gtk+-3.0 libgnome-menu-3.0 libelogind x11"
     local launcher_modules="gio-unix-2.0 gtk+-3.0 libgnome-menu-3.0 libelogind"
