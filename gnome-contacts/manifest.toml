@@ -1,0 +1,31 @@
+# manifest.toml - gnome-contacts (syshub tier)
+
+[package]
+name             = "gnome-contacts"
+version          = "49.0"
+description      = "Contact management application for GNOME"
+license          = "GPL-2.0-or-later"
+maintainer       = "Ali Zain <alizain@zainiumdynamics.tech>"
+homepage         = "https://apps.gnome.org/Contacts/"
+build_type       = "dynamic"
+libc_target      = "musl"
+
+blake3           = ""
+ed25519_sig      = ""
+ed25519_pubkey   = ""
+
+depends          = ["folks", "libgee", "glib", "gtk4", "libadwaita", "evolution-data-server", "libportal", "gstreamer", "qrencode"]
+provides         = ["gnome-contacts"]
+tags             = ["gnome", "contacts", "app"]
+
+[install]
+bin     = "/overlayer/syshub/bin"
+share   = "/overlayer/syshub/share"
+_syshub = true
+
+[remove]
+files    = []
+dirs     = []
+symlinks = []
+
+[hooks]

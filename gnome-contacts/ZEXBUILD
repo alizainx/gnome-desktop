@@ -1,0 +1,47 @@
+maintainer="Ali Zain <alizain@zainiumdynamics.tech>"
+pkgname=gnome-contacts
+pkgver=49.0
+pkgrel=0
+# Meson, Vala. No systemd/elogind touchpoint. Carries one patch, same
+# one Gentoo carries: gnome-contacts-49.0 was written against the
+# evolution-data-server-3.58 vCard export Vala API
+# (E.VCardFormat.@30); evolution-data-server 3.60+ renamed that type
+# to E.VCardVersion. This repo's evolution-data-server recipe is
+# 3.60.2, so the patch is required, not optional.
+source="https://download.gnome.org/sources/gnome-contacts/49/gnome-contacts-$pkgver.tar.xz
+0001-eds-3.60-vcard-export-api.patch"
+sha256sums="25f21c67bc29d77def2d9cd3e22d28460d12b47ff248a2017731b54db485e4af  gnome-contacts-$pkgver.tar.xz"
+# makedepends matched against Alpine's real aports recipe
+# (community/gnome-contacts) - was missing blueprint-compiler,
+# desktop-file-utils, gnome-desktop-dev, telepathy-glib-dev.
+# gnome-online-accounts-dev and libglycin-gtk4-dev left off: -Dgoa=false
+# below (not published here), and libglycin is a 50.x-only avatar
+# loader not present in this pinned 49.0 meson.build.
+makedepends="folks-dev libgee-dev glib-dev gtk4.0-dev libadwaita-dev evolution-data-server-dev libportal-dev gstreamer-dev libqrencode-dev vala blueprint-compiler desktop-file-utils gnome-desktop-dev telepathy-glib-dev"
+
+# Deps this recipe assumes, none published yet: folks, libgee, glib,
+# gtk4, libadwaita, evolution-data-server, libportal, gstreamer,
+# qrencode, vala (host, for folks/libportal/evolution-data-server
+# vapi files). gnome-online-accounts support left off, not published
+# here.
+build() {
+    patch -p1 < ../0001-eds-3.60-vcard-export-api.patch
+
+    meson setup builddir \
+        --prefix=/overlayer/syshub \
+        --libdir=/overlayer/syshub/lib \
+        --includedir=/overlayer/syshub/include \
+        -Dcamera=true \
+        -Dmanpage=true \
+        -Ddocs=false \
+        -Dgoa=false
+    ninja -C builddir
+    DESTDIR="$(pwd)/_zexbuild-install" ninja -C builddir install
+}
+
+package() {
+    local inst="_zexbuild-install/overlayer/syshub"
+    mkdir -p "$PAYLOAD_DIR/bin" "$PAYLOAD_DIR/share"
+    cp -a "$inst"/bin/. "$PAYLOAD_DIR/bin/" 2>/dev/null || true
+    cp -a "$inst"/share/. "$PAYLOAD_DIR/share/" 2>/dev/null || true
+}
