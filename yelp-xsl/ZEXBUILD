@@ -1,0 +1,34 @@
+maintainer="Ali Zain <alizain@zainiumdynamics.tech>"
+pkgname=yelp-xsl
+pkgver=49.0
+pkgrel=0
+# Meson, but project() declares no compiled language - confirmed by
+# reading meson.build directly, this is a pure XSLT stylesheet/data
+# package (Mallard and Docbook -> HTML conversion for yelp). No
+# systemd/elogind touchpoint, no cross-toolchain needed - meson setup
+# needs no C compiler flags here, just the host libxslt/itstool tools
+# already on the CI image's PATH.
+source="https://download.gnome.org/sources/yelp-xsl/49/yelp-xsl-$pkgver.tar.xz"
+sha256sums="59d43a8f8fe67b784f14f9a04dd4a7a092a7f4a64a65e71b90fe02a47a50fbec  yelp-xsl-$pkgver.tar.xz"
+# libxslt/itstool are host tools used to run xsltproc during the
+# build, not linked into anything - covered by the CI image's base
+# toolchain already (same as the old recipe's assumption). Matched
+# against Alpine's real aports recipe (community/yelp-xsl): it uses
+# plain libxslt (the xsltproc binary), not libxslt-dev (headers, not
+# needed - nothing here compiles against libxslt); also needs
+# intltool and libxml2-utils (xmllint), both host tools too.
+makedepends="intltool itstool libxml2-utils libxslt"
+
+build() {
+    meson setup builddir \
+        --prefix=/overlayer/syshub \
+        --libdir=/overlayer/syshub/lib \
+        --includedir=/overlayer/syshub/include
+    ninja -C builddir
+    DESTDIR="$(pwd)/_zexbuild-install" ninja -C builddir install
+}
+
+package() {
+    local inst="_zexbuild-install/overlayer/syshub"
+    cp -a "$inst"/. "$PAYLOAD_DIR"/
+}
