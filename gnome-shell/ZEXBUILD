@@ -51,35 +51,31 @@ build() {
         -Dnetworkmanager=false \
         -Dportal_helper=false
 
-    echo "=== CHECK MUTTER ==="
+
+    echo "=== MUTTER NEEDED ==="
+    find builddir -name 'libmutter-cogl-18.so*' -exec sh -c '
+        for f do
+            echo "FILE: $f"
+            readelf -d "$f" | grep NEEDED || true
+        done
+    ' sh {} \;
+
+    echo "=== LIBRARIES ==="
     find /usr /overlayer/syshub \
-        -name 'libmutter-cogl-18.so*' \
+        \( -name 'libglib-2.0.so*' \
+        -o -name 'libgobject-2.0.so*' \
+        -o -name 'libgio-2.0.so*' \
+        -o -name 'libgraphene-1.0.so*' \
+        -o -name 'libEGL.so*' \) \
         -print 2>/dev/null || true
 
-    echo "=== CHECK GLIB ==="
-    find /usr /overlayer/syshub \
-        -name 'libglib-2.0.so*' \
-        -print 2>/dev/null || true
-
-    echo "=== CHECK GOBJECT ==="
-    find /usr /overlayer/syshub \
-        -name 'libgobject-2.0.so*' \
-        -print 2>/dev/null || true
-
-    echo "=== CHECK GRAPHENE ==="
-    find /usr /overlayer/syshub \
-        -name 'libgraphene-1.0.so*' \
-        -print 2>/dev/null || true
-
-    echo "=== CHECK EGL ==="
-    find /usr /overlayer/syshub \
-        -name 'libEGL.so*' \
-        -print 2>/dev/null || true
+    echo "=== PKGCONFIG ==="
+    pkg-config --libs glib-2.0 || true
+    pkg-config --libs gobject-2.0 || true
+    pkg-config --libs graphene-1.0 || true
+    pkg-config --libs egl || true
 
     ninja -C builddir
-
-    DESTDIR="$(pwd)/_zexbuild-install" \
-        ninja -C builddir install
 }
 
 package() {
