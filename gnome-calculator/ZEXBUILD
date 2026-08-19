@@ -1,0 +1,48 @@
+maintainer="Ali Zain <alizain@zainiumdynamics.tech>"
+pkgname=gnome-calculator
+pkgver=50.0
+pkgrel=0
+# Meson, Vala. No systemd/elogind touchpoint. Carries two patches,
+# both already carried by Gentoo for this version and both genuine
+# upstream compile/correctness fixes, not musl-specific:
+#   0001-mpc-1.4.patch: complex-number inversion left the imaginary
+#   component unset for real inputs, visible as a regression against
+#   mpc >=1.4.
+#   0002-strict-aliasing.patch: replaces pointer type-punning casts
+#   (*(uint32*)&f) with Memory.copy, required to build clean under
+#   -Werror=strict-aliasing on a modern GCC - exactly what this
+#   toolchain is.
+source="https://download.gnome.org/sources/gnome-calculator/50/gnome-calculator-$pkgver.tar.xz
+0001-mpc-1.4.patch
+0002-strict-aliasing.patch"
+sha256sums="8053d6891565e882874b65c1db51c5bf310005eb788b8bac3546390743350a90  gnome-calculator-$pkgver.tar.xz"
+# Alpine's real recipe (community/gnome-calculator) passes zero extra
+# meson flags beyond abuild-meson's standard prefix/etc set - trusting
+# meson_options.txt's own defaults instead of a hand-picked flag list
+# that may not even match real option names (our previous draft had
+# -Ddisable-ui/-Ddisable-introspection/-Dui-tests/-Dgcalc/-Dgci/-Dapp/
+# -Ddoc, none of which are confirmed against the actual
+# meson_options.txt). blueprint-compiler added, matches Alpine.
+makedepends="blueprint-compiler glib-dev libxml2-dev libsoup3-dev libgee-dev mpc1-dev mpfr-dev gtk4.0-dev libadwaita-dev gtksourceview5-dev vala"
+
+build() {
+    patch -p1 < ../0001-mpc-1.4.patch
+    patch -p1 < ../0002-strict-aliasing.patch
+
+    meson setup builddir \
+        --prefix=/overlayer/syshub \
+        --libdir=/overlayer/syshub/lib \
+        --includedir=/overlayer/syshub/include
+    ninja -C builddir
+    DESTDIR="$(pwd)/_zexbuild-install" ninja -C builddir install
+}
+
+package() {
+    local inst="_zexbuild-install/overlayer/syshub"
+    mkdir -p "$PAYLOAD_DIR/bin" "$PAYLOAD_DIR/lib" "$PAYLOAD_DIR/share"
+    cp -a "$inst"/bin/. "$PAYLOAD_DIR/bin/" 2>/dev/null || true
+    cp -a "$inst"/lib/. "$PAYLOAD_DIR/lib/" 2>/dev/null || true
+    rm -rf "$PAYLOAD_DIR/lib/pkgconfig"
+    find "$PAYLOAD_DIR/lib" -maxdepth 1 \( -name '*.a' -o -name '*.la' \) -delete
+    cp -a "$inst"/share/. "$PAYLOAD_DIR/share/" 2>/dev/null || true
+}
