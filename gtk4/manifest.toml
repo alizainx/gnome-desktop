@@ -1,0 +1,32 @@
+# manifest.toml - gtk4 (syshub tier)
+
+[package]
+name             = "gtk4"
+version          = "4.20.4"
+description      = "GTK 4 multi-platform GUI toolkit (libgtk-4)"
+license          = "LGPL-2.0-or-later"
+maintainer       = "Ali Zain <alizain@zainiumdynamics.tech>"
+homepage         = "https://www.gtk.org/"
+build_type       = "dynamic"
+libc_target      = "musl"
+
+blake3           = ""
+ed25519_sig      = ""
+ed25519_pubkey   = ""
+
+depends          = ["glib", "cairo", "pango", "fribidi", "harfbuzz", "gdk-pixbuf", "libpng", "tiff", "libjpeg-turbo", "librsvg", "libepoxy", "graphene", "iso-codes", "shared-mime-info", "wayland", "libxkbcommon", "mesa", "libx11", "libxi", "libxext", "libxrandr", "libxcursor", "libxfixes", "libxdamage", "libxinerama", "fontconfig"]
+provides         = ["libgtk-4.so"]
+tags             = ["gnome", "gtk", "toolkit"]
+
+[install]
+bin     = "/overlayer/syshub/bin"
+lib     = "/overlayer/syshub/lib"
+share   = "/overlayer/syshub/share"
+_syshub = true
+
+[remove]
+files    = []
+dirs     = []
+symlinks = []
+
+[hooks]

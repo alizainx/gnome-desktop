@@ -1,0 +1,70 @@
+maintainer="Ali Zain <alizain@zainiumdynamics.tech>"
+pkgname=gtk4
+pkgver=4.20.4
+pkgrel=0
+# Upstream package/tarball name is "gtk" (SLOT 4 in Gentoo, gui-libs/gtk).
+# No systemd/elogind touchpoint anywhere in meson.options or meson.build -
+# bucket A, no patch, no special flag. Recipe dir/pkgname is "gtk4" to
+# avoid colliding with a future GTK3 recipe, so the tarball extracts to
+# gtk-$pkgver, not gtk4-$pkgver - build() cds into it explicitly (this
+# is a real mismatch, not the redundant-cd bug found elsewhere: ci/
+# build.sh's auto-cd tries "gtk4-$pkgver", which doesn't exist, so it
+# silently no-ops and cwd stays at the source root without this cd).
+source="https://download.gnome.org/sources/gtk/4.20/gtk-$pkgver.tar.xz"
+sha256sums="a21f825bd44afc4dd99ba4eea8ff57c8f2e51085cb402a68ed4cbb35299826a4  gtk-$pkgver.tar.xz"
+# Trimmed from Alpine's own real gtk4.0 APKBUILD makedepends to what
+# our -D... flags below still enable (introspection/cups/gstreamer/
+# vulkan/docs/broadway all disabled here).
+makedepends="glib-dev cairo-dev pango-dev fribidi-dev harfbuzz-dev gdk-pixbuf-dev libpng-dev tiff-dev libjpeg-turbo-dev librsvg-dev libepoxy-dev graphene-dev iso-codes-dev shared-mime-info wayland-dev libxkbcommon-dev mesa-dev libx11-dev libxi-dev libxext-dev libxrandr-dev libxcursor-dev libxfixes-dev libxdamage-dev libxinerama-dev fontconfig-dev"
+
+# Deps this recipe assumes, none published yet: glib, cairo, pango,
+# fribidi, harfbuzz, gdk-pixbuf, libpng, tiff, libjpeg-turbo, librsvg,
+# libepoxy, graphene, iso-codes, shared-mime-info, wayland,
+# libxkbcommon, mesa, and the various libX11 family libs. gtk4 will not
+# configure until these exist. Introspection off for now, same
+# reasoning as every other recipe here: no working exe_wrapper for
+# cross builds yet. gstreamer/vulkan/cloudproviders/sysprof/colord/cups
+# all off since none of those have recipes either.
+build() {
+    cd gtk-$pkgver
+
+    meson setup builddir \
+        --prefix=/overlayer/syshub \
+        --libdir=/overlayer/syshub/lib \
+        --includedir=/overlayer/syshub/include \
+        -Dx11-backend=true \
+        -Dwayland-backend=true \
+        -Dbroadway-backend=false \
+        -Dwin32-backend=false \
+        -Dandroid-backend=false \
+        -Dmacos-backend=false \
+        -Dmedia-gstreamer=disabled \
+        -Dprint-cpdb=disabled \
+        -Dprint-cups=disabled \
+        -Dvulkan=disabled \
+        -Dcloudproviders=disabled \
+        -Dsysprof=disabled \
+        -Dtracker=disabled \
+        -Dcolord=disabled \
+        -Df16c=false \
+        -Dandroid-runtime=disabled \
+        -Dintrospection=disabled \
+        -Ddocumentation=false \
+        -Dscreenshots=false \
+        -Dman-pages=false \
+        -Dprofile=default \
+        -Dbuild-demos=false \
+        -Dbuild-testsuite=false \
+        -Dbuild-examples=false \
+        -Dbuild-tests=false
+    ninja -C builddir
+    DESTDIR="$(pwd)/_zexbuild-install" ninja -C builddir install
+}
+
+# cwd is already gtk-$pkgver/ here, build() already cd'd into it and
+# that persists (package() runs in the same shell process as build()).
+package() {
+    local inst="_zexbuild-install/overlayer/syshub"
+    mkdir -p "$PAYLOAD_DIR"
+    cp -a "$inst"/. "$PAYLOAD_DIR"/
+}
