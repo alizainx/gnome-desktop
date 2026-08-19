@@ -39,7 +39,6 @@ build() {
         --includedir=/overlayer/syshub/include \
         -Dopengl=true \
         -Degl=true \
-        -Dglx=false \
         -Dgles2=true \
         -Dwayland=true \
         -Dxwayland=false \
