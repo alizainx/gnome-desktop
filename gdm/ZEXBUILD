@@ -47,7 +47,6 @@ build() {
         -Drun-dir=/run/gdm \
         -Dselinux=disabled \
         -Dsystemd-journal=false \
-        -Dtcp-wrappers=false \
         -Duser=gdm \
         -Duser-display-server=true \
         -Dx11-support=true \
