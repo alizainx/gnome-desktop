@@ -12,7 +12,7 @@ pkgrel=0
 # copied verbatim from the ebuild's src_configure().
 source="https://download.gnome.org/sources/gnome-panel/3.58/gnome-panel-$pkgver.tar.xz"
 sha256sums="7e8bca43a81a134c666b3a78baf2affb0c5d30efb1bca653887fc41b31dd5e64  gnome-panel-$pkgver.tar.xz"
-makedepends="glib-dev gnome-desktop-dev gdk-pixbuf-dev pango-dev gtk+3.0-dev libwnck3-dev gnome-menus-dev gsettings-desktop-schemas-dev cairo-dev libgweather4-dev dconf-dev libx11-dev gdm-dev geocode-glib-dev polkit-dev"
+makedepends="itstool glib-dev gnome-desktop-dev gdk-pixbuf-dev pango-dev gtk+3.0-dev libwnck3-dev gnome-menus-dev gsettings-desktop-schemas-dev cairo-dev libgweather4-dev dconf-dev libx11-dev gdm-dev geocode-glib-dev polkit-dev"
 
 # Deps this recipe assumes, none published yet: gnome-desktop,
 # gdk-pixbuf, pango, glib, gtk3, libwnck, gnome-menus,
