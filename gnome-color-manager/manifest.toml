@@ -1,0 +1,31 @@
+# manifest.toml - gnome-color-manager (syshub tier)
+
+[package]
+name             = "gnome-color-manager"
+version          = "3.36.2"
+description      = "GNOME color profile management tools"
+license          = "GPL-2.0-or-later"
+maintainer       = "Ali Zain <alizain@zainiumdynamics.tech>"
+homepage         = "https://gitlab.gnome.org/GNOME/gnome-color-manager/"
+build_type       = "dynamic"
+libc_target      = "musl"
+
+blake3           = ""
+ed25519_sig      = ""
+ed25519_pubkey   = ""
+
+depends          = ["glib", "gtk3", "colord", "lcms2"]
+provides         = ["gnome-color-manager"]
+tags             = ["gnome", "color", "app"]
+
+[install]
+bin     = "/overlayer/syshub/bin"
+share   = "/overlayer/syshub/share"
+_syshub = true
+
+[remove]
+files    = []
+dirs     = []
+symlinks = []
+
+[hooks]

@@ -1,0 +1,30 @@
+maintainer="Ali Zain <alizain@zainiumdynamics.tech>"
+pkgname=gnome-color-manager
+pkgver=3.36.2
+pkgrel=0
+# Meson, C. No systemd/elogind touchpoint. Man pages need
+# docbook-sgml-utils/docbook-sgml-dtd (BDEPEND in the Gentoo ebuild),
+# not published here yet - if the meson run below fails on that,
+# it's a missing BDEPEND, not a flag to toggle off.
+source="https://download.gnome.org/sources/gnome-color-manager/3.36/gnome-color-manager-$pkgver.tar.xz"
+sha256sums="3904d42abb4ea566df0b880e82bf0b9f86386c692f15b318469a4c7be33a887f  gnome-color-manager-$pkgver.tar.xz"
+makedepends="glib-dev gtk+3.0-dev colord-dev lcms2-dev"
+
+# Deps this recipe assumes, none published yet: glib, gtk3, colord,
+# lcms2.
+build() {
+    meson setup builddir \
+        --prefix=/overlayer/syshub \
+        --libdir=/overlayer/syshub/lib \
+        --includedir=/overlayer/syshub/include \
+        -Dtests=false
+    ninja -C builddir
+    DESTDIR="$(pwd)/_zexbuild-install" ninja -C builddir install
+}
+
+package() {
+    local inst="_zexbuild-install/overlayer/syshub"
+    mkdir -p "$PAYLOAD_DIR/bin" "$PAYLOAD_DIR/share"
+    cp -a "$inst"/bin/. "$PAYLOAD_DIR/bin/" 2>/dev/null || true
+    cp -a "$inst"/share/. "$PAYLOAD_DIR/share/" 2>/dev/null || true
+}
