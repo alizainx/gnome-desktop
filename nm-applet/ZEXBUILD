@@ -1,0 +1,46 @@
+maintainer="Ali Zain <alizain@zainiumdynamics.tech>"
+pkgname=nm-applet
+pkgver=1.36.0
+pkgrel=0
+# Upstream tarball/project name is "network-manager-applet"
+# (GNOME_ORG_MODULE in the Gentoo ebuild); pkgname here is nm-applet
+# to match this repo's naming. Meson, C. No systemd/elogind
+# touchpoint - it only talks to NetworkManager over D-Bus. Tarball
+# root is network-manager-applet-$pkgver, not $pkgname-$pkgver, so
+# build() cds into it explicitly (ci/build.sh's auto-cd only tries
+# "$pkgname-$pkgver").
+source="https://download.gnome.org/sources/network-manager-applet/1.36/network-manager-applet-$pkgver.tar.xz"
+sha256sums="a84704487ea3afe1485c47fb2ab598b8f779f540ae0dcbf0a1c5f85e64a7e253  network-manager-applet-$pkgver.tar.xz"
+# makedepends matched against Alpine's real aports recipe
+# (community/network-manager-applet) - was missing gcr-dev,
+# jansson-dev, libayatana-appindicator-dev, libdbusmenu-gtk3-dev,
+# libgudev-dev, libnotify-dev, modemmanager-dev, polkit-dev. These
+# aren't optional extras: appindicator/dbusmenu are the actual tray
+# icon backend (this package's whole point as "the network applet"),
+# libnotify drives its connection-state popups, gcr/polkit back its
+# certificate + privileged-connection-edit dialogs, modemmanager +
+# libgudev back mobile broadband. Enabling appindicator/wwan below to
+# match having these deps present, same as Alpine's build does.
+makedepends="gcr-dev glib-dev gtk+3.0-dev jansson-dev libayatana-appindicator-dev libdbusmenu-gtk3-dev libgudev-dev libnma-dev libnotify-dev libsecret-dev modemmanager-dev networkmanager-dev polkit-dev"
+
+build() {
+    cd network-manager-applet-$pkgver
+
+    meson setup builddir \
+        --prefix=/overlayer/syshub \
+        --libdir=/overlayer/syshub/lib \
+        --includedir=/overlayer/syshub/include \
+        -Dappindicator=yes \
+        -Dwwan=true \
+        -Dselinux=false \
+        -Dteam=false \
+        -Dmore_asserts=0 \
+        -Dld_gc=false
+    ninja -C builddir
+    DESTDIR="$(pwd)/_zexbuild-install" ninja -C builddir install
+}
+
+package() {
+    local inst="_zexbuild-install/overlayer/syshub"
+    cp -a "$inst"/. "$PAYLOAD_DIR"/
+}
