@@ -21,8 +21,8 @@ build() {
         --prefix=/overlayer/syshub \
         --libdir=/overlayer/syshub/lib \
         --includedir=/overlayer/syshub/include \
-        -Dwayland=true \
-        -DX11=true \
+        -Dwayland=enabled \
+        -DX11=enabled \
         -Dprofile=default
     ninja -C builddir
     DESTDIR="$(pwd)/_zexbuild-install" ninja -C builddir install
