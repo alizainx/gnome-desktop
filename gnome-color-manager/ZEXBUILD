@@ -27,4 +27,10 @@ package() {
     mkdir -p "$PAYLOAD_DIR/bin" "$PAYLOAD_DIR/share"
     cp -a "$inst"/bin/. "$PAYLOAD_DIR/bin/" 2>/dev/null || true
     cp -a "$inst"/share/. "$PAYLOAD_DIR/share/" 2>/dev/null || true
+
+    # .desktop files hardcode Exec=/usr/bin/... - substrate's payload
+    # check rejects any /usr text reference regardless of source.
+    grep -RIl '/usr/' "$PAYLOAD_DIR" 2>/dev/null | while IFS= read -r f; do
+        sed -i 's#/usr/#/overlayer/syshub/#g' "$f"
+    done
 }
