@@ -1,0 +1,33 @@
+# manifest.toml - nautilus (syshub tier)
+
+[package]
+name             = "nautilus"
+version          = "49.6"
+description      = "Default file manager for the GNOME desktop"
+license          = "GPL-3.0-or-later"
+maintainer       = "Ali Zain <alizain@zainiumdynamics.tech>"
+homepage         = "https://apps.gnome.org/Nautilus/"
+build_type       = "dynamic"
+libc_target      = "musl"
+
+blake3           = ""
+ed25519_sig      = ""
+ed25519_pubkey   = ""
+
+depends          = ["glib", "gexiv2", "gnome-autoar", "gnome-desktop", "gsettings-desktop-schemas", "gtk4", "wayland", "libadwaita", "libportal", "icu", "pango", "tinysparql", "localsearch", "gstreamer", "gst-plugins-base", "gvfs"]
+provides         = ["nautilus"]
+tags             = ["gnome", "files", "desktop"]
+
+[install]
+bin     = "/overlayer/syshub/bin"
+lib     = "/overlayer/syshub/lib"
+libexec = "/overlayer/syshub/libexec"
+share   = "/overlayer/syshub/share"
+_syshub = true
+
+[remove]
+files    = []
+dirs     = []
+symlinks = []
+
+[hooks]
