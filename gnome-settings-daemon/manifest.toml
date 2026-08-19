@@ -1,0 +1,33 @@
+# manifest.toml - gnome-settings-daemon (syshub tier)
+
+[package]
+name             = "gnome-settings-daemon"
+version          = "49.1"
+description      = "GNOME session settings daemon, systemd-optional build (elogind/qlogind)"
+license          = "GPL-2.0-or-later"
+maintainer       = "Ali Zain <alizain@zainiumdynamics.tech>"
+homepage         = "https://gitlab.gnome.org/GNOME/gnome-settings-daemon"
+build_type       = "dynamic"
+libc_target      = "musl"
+
+blake3           = ""
+ed25519_sig      = ""
+ed25519_pubkey   = ""
+
+depends          = ["glib", "gnome-desktop", "gsettings-desktop-schemas", "geocode-glib", "libgweather", "libcanberra", "geoclue", "libpulse", "polkit", "upower", "libgudev", "wayland", "alsa-lib", "fontconfig", "libnotify", "quantra-logind"]
+provides         = ["gnome-settings-daemon"]
+tags             = ["gnome", "desktop", "daemon"]
+
+[install]
+bin     = "/overlayer/syshub/bin"
+lib     = "/overlayer/syshub/lib"
+libexec = "/overlayer/syshub/libexec"
+share   = "/overlayer/syshub/share"
+_syshub = true
+
+[remove]
+files    = []
+dirs     = []
+symlinks = []
+
+[hooks]
