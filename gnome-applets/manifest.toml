@@ -1,0 +1,32 @@
+# manifest.toml - gnome-applets (syshub tier)
+
+[package]
+name             = "gnome-applets"
+version          = "3.58.0"
+description      = "Applets for the GNOME Flashback panel"
+license          = "GPL-2.0-or-later"
+maintainer       = "Ali Zain <alizain@zainiumdynamics.tech>"
+homepage         = "https://gitlab.gnome.org/GNOME/gnome-applets/"
+build_type       = "dynamic"
+libc_target      = "musl"
+
+blake3           = ""
+ed25519_sig      = ""
+ed25519_pubkey   = ""
+
+depends          = ["gtk3", "glib", "gnome-panel", "libgtop", "libwnck", "libnotify", "upower", "adwaita-icon-theme", "libxml2", "libgweather", "gucharmap", "polkit", "libx11", "pango"]
+provides         = ["gnome-applets"]
+tags             = ["gnome", "flashback", "applets"]
+
+[install]
+bin     = "/overlayer/syshub/bin"
+lib     = "/overlayer/syshub/lib"
+share   = "/overlayer/syshub/share"
+_syshub = true
+
+[remove]
+files    = []
+dirs     = []
+symlinks = []
+
+[hooks]
