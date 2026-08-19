@@ -23,7 +23,7 @@ sha256sums="8053d6891565e882874b65c1db51c5bf310005eb788b8bac3546390743350a90  gn
 # -Ddisable-ui/-Ddisable-introspection/-Dui-tests/-Dgcalc/-Dgci/-Dapp/
 # -Ddoc, none of which are confirmed against the actual
 # meson_options.txt). blueprint-compiler added, matches Alpine.
-makedepends="blueprint-compiler glib-dev libxml2-dev libsoup3-dev libgee-dev mpc1-dev mpfr-dev gtk4.0-dev libadwaita-dev gtksourceview5-dev vala"
+makedepends="blueprint-compiler glib-dev libxml2-dev libsoup3-dev libgee-dev mpc1-dev mpfr-dev gtk4.0-dev libadwaita-dev gtksourceview5-dev vala itstool"
 
 build() {
     patch -p1 < ../0001-mpc-1.4.patch
