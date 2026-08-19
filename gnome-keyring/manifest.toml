@@ -2,7 +2,7 @@
 
 [package]
 name             = "gnome-keyring"
-version          = "48.0"
+version          = "50.0"
 description      = "Password and keyring managing daemon, systemd optional (plain feature, no elogind fallback)"
 license          = "GPL-2.0-or-later"
 maintainer       = "Ali Zain <alizain@zainiumdynamics.tech>"
