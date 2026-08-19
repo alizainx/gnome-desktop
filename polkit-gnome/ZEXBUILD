@@ -1,0 +1,46 @@
+maintainer="Ali Zain <alizain@zainiumdynamics.tech>"
+pkgname=polkit-gnome
+pkgver=0.105
+pkgrel=0
+# Autotools, ships a pregenerated ./configure (no autoreconf needed).
+# A D-Bus session service that pops up PolicyKit authentication
+# dialogs - no systemd/elogind dependency at all, just links against
+# polkit-gobject-1 and gtk+-3.0. No patch needed.
+#
+# Alpine's real recipe also ships its own autostart .desktop file -
+# upstream's tarball doesn't install one, so without it the agent
+# never actually launches in a session and every polkit prompt would
+# silently fail. Carried over verbatim from community/polkit-gnome,
+# Exec= path rewritten in package() to this repo's libexecdir.
+source="https://download.gnome.org/sources/polkit-gnome/0.105/polkit-gnome-$pkgver.tar.xz
+polkit-gnome-authentication-agent-1.desktop"
+sha256sums="1784494963b8bf9a00eedc6cd3a2868fb123b8a5e516e66c5eda48df17ab9369  polkit-gnome-$pkgver.tar.xz"
+# makedepends matched against Alpine's real aports recipe
+# (community/polkit-gnome) - added intltool, polkit-dev (dropped
+# from the earlier draft's "our own package, not an apk stand-in"
+# reasoning - Alpine's own -dev package is what every other recipe
+# here builds makedepends from, same as gtk+3.0-dev/glib-dev).
+makedepends="glib-dev gtk+3.0-dev intltool polkit-dev"
+
+build() {
+    ./configure \
+        --host="$CHOST" \
+        --prefix=/overlayer/syshub \
+        --libdir=/overlayer/syshub/lib \
+        --libexecdir=/overlayer/syshub/lib/polkit-gnome \
+        --sysconfdir=/overlayer/syshub/etc \
+        --localstatedir=/overlayer/syshub/var \
+        --disable-static
+    make
+    make DESTDIR="$(pwd)/_zexbuild-install" install
+}
+
+package() {
+    local inst="_zexbuild-install/overlayer/syshub"
+    cp -a "$inst"/. "$PAYLOAD_DIR"/
+
+    install -Dm644 ../polkit-gnome-authentication-agent-1.desktop \
+        "$PAYLOAD_DIR/etc/xdg/autostart/polkit-gnome-authentication-agent-1.desktop"
+    sed -i 's#/usr/lib/polkit-gnome#/overlayer/syshub/lib/polkit-gnome#' \
+        "$PAYLOAD_DIR/etc/xdg/autostart/polkit-gnome-authentication-agent-1.desktop"
+}
