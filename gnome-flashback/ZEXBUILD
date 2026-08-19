@@ -17,7 +17,7 @@ pkgrel=0
 # must be rechecked against configure.ac on every version bump.
 source="https://download.gnome.org/sources/gnome-flashback/3.58/gnome-flashback-$pkgver.tar.xz"
 sha256sums="aaa23e7042477e741f24279b468b9d20af4ec195ee43b3d312cdaaf84d98c321  gnome-flashback-$pkgver.tar.xz"
-makedepends="ibus-dev libxkbfile-dev gdk-pixbuf-dev gtk+3.0-dev gnome-desktop-dev libcanberra-dev glib-dev gsettings-desktop-schemas-dev elogind-dev libx11-dev libxxf86vm-dev alsa-lib-dev"
+makedepends="polkit-dev ibus-dev libxkbfile-dev gdk-pixbuf-dev gtk+3.0-dev gnome-desktop-dev libcanberra-dev glib-dev gsettings-desktop-schemas-dev elogind-dev libx11-dev libxxf86vm-dev alsa-lib-dev"
 
 # Deps this recipe assumes, none published yet: gdk-pixbuf, gtk3,
 # gnome-desktop, gnome-panel, libcanberra, glib, gsettings-desktop-schemas,
