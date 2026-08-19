@@ -46,7 +46,7 @@ build() {
         -Dsysprof=disabled \
         -Dtracker=disabled \
         -Dcolord=disabled \
-        -Df16c=false \
+        -Df16c=disabled \
         -Dandroid-runtime=disabled \
         -Dintrospection=disabled \
         -Ddocumentation=false \
