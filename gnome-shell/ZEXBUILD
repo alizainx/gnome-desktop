@@ -21,7 +21,14 @@ sha256sums="a9e60f1235d1f34c4e25fd70702f544ecdd2c164d9d18123787a3b96f9b984b8  gn
 # tecla (no manifest dependency on those). sassc kept unconditionally -
 # gnome-shell's build always compiles its scss stylesheet with it,
 # not gated behind any meson option.
-makedepends="elogind-dev evolution-data-server-dev gcr4-dev gjs-dev gnome-autoar-dev gnome-desktop-dev gobject-introspection-dev gstreamer-dev gtk4.0-dev ibus-dev json-glib-dev libcanberra-dev libxml2-dev mutter-dev pipewire-dev polkit-dev pulseaudio-dev sassc startup-notification-dev"
+#
+# libx11-dev/libxext-dev/libxfixes-dev: not in Alpine's own gnome-shell
+# makedepends at all, but meson.build reads have_x11/have_x11_client
+# straight off mutter_dep's pkg-config variables - `if have_x11_client
+# or have_x11: dependency('x11'); dependency('xext'); dependency('xfixes')`.
+# Our mutter recipe builds with -Dx11=true, so this branch is always
+# taken here even though it's undeclared in our own -D... flags below.
+makedepends="elogind-dev evolution-data-server-dev gcr4-dev gjs-dev gnome-autoar-dev gnome-desktop-dev gobject-introspection-dev gstreamer-dev gtk4.0-dev ibus-dev json-glib-dev libcanberra-dev libxml2-dev libx11-dev libxext-dev libxfixes-dev mutter-dev pipewire-dev polkit-dev pulseaudio-dev sassc startup-notification-dev"
 
 # Not published yet: mutter, gjs, gtk4, gnome-desktop, gnome-autoar,
 # json-glib, ibus, pipewire, networkmanager. Will not configure until
