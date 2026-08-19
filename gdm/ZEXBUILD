@@ -48,7 +48,6 @@ build() {
         -Dselinux=disabled \
         -Dsystemd-journal=false \
         -Dx11-support=true \
-        -Dxdmcp=disabled \
         -Dinitial-vt=7 \
         -Dsystemdsystemunitdir=no \
         -Dsystemduserunitdir=no
