@@ -1,0 +1,38 @@
+maintainer="Ali Zain <alizain@zainiumdynamics.tech>"
+pkgname=gnome-power-manager
+pkgver=43.0
+pkgrel=0
+# Meson, C. No systemd/elogind touchpoint - confirmed against
+# meson_options.txt directly (enable-tests only). Man pages need
+# docbook-sgml-utils/docbook-sgml-dtd (BDEPEND in the Gentoo ebuild),
+# not published here yet.
+#
+# Alpine's current aports recipe (community/gnome-power-manager) is
+# pkgver 50.0, a GTK4 rewrite (gtk4.0-dev + gobject-introspection-dev
+# instead of gtk+3.0-dev/cairo-dev, no -Denable-tests flag at all) -
+# too large a jump to port makedepends/build() from directly without
+# the real 50.0 tarball to check its meson_options.txt against, so
+# staying on this recipe's already-hashed 43.0 (last GTK3 release)
+# rather than guess at 50.0's build. makedepends/flags below are
+# already correct for 43.0's actual GTK3 meson_options.txt.
+source="https://download.gnome.org/sources/gnome-power-manager/43/gnome-power-manager-$pkgver.tar.xz"
+sha256sums="7daab48bbddb30e9df2aba650cb60d05e667c9f885ace6a0a1e7950e0cbdd32f  gnome-power-manager-$pkgver.tar.xz"
+makedepends="glib-dev gtk+3.0-dev cairo-dev upower-dev"
+
+# Deps this recipe assumes, none published yet: glib, gtk3, cairo,
+# upower, adwaita-icon-theme.
+build() {
+    meson setup builddir \
+        --prefix=/overlayer/syshub \
+        --libdir=/overlayer/syshub/lib \
+        --includedir=/overlayer/syshub/include \
+        -Denable-tests=false
+    ninja -C builddir
+    DESTDIR="$(pwd)/_zexbuild-install" ninja -C builddir install
+}
+
+package() {
+    local inst="_zexbuild-install/overlayer/syshub"
+    mkdir -p "$PAYLOAD_DIR"
+    cp -a "$inst"/. "$PAYLOAD_DIR"/
+}

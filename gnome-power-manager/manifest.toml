@@ -1,0 +1,31 @@
+# manifest.toml - gnome-power-manager (syshub tier)
+
+[package]
+name             = "gnome-power-manager"
+version          = "43.0"
+description      = "GNOME power statistics and history viewer"
+license          = "GPL-2.0-or-later"
+maintainer       = "Ali Zain <alizain@zainiumdynamics.tech>"
+homepage         = "https://gitlab.gnome.org/GNOME/gnome-power-manager"
+build_type       = "dynamic"
+libc_target      = "musl"
+
+blake3           = ""
+ed25519_sig      = ""
+ed25519_pubkey   = ""
+
+depends          = ["glib", "gtk3", "cairo", "upower", "adwaita-icon-theme"]
+provides         = ["gnome-power-manager"]
+tags             = ["gnome", "power", "app"]
+
+[install]
+bin     = "/overlayer/syshub/bin"
+share   = "/overlayer/syshub/share"
+_syshub = true
+
+[remove]
+files    = []
+dirs     = []
+symlinks = []
+
+[hooks]
