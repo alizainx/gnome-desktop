@@ -7,9 +7,32 @@ source="https://download.gnome.org/sources/gnome-panel/3.58/gnome-panel-$pkgver.
 
 sha256sums="7e8bca43a81a134c666b3a78baf2affb0c5d30efb1bca653887fc41b31dd5e64  gnome-panel-$pkgver.tar.xz"
 
-makedepends="itstool glib-dev gnome-desktop-dev gdk-pixbuf-dev pango-dev gtk+3.0-dev libwnck3-dev gnome-menus-dev gsettings-desktop-schemas-dev cairo-dev libgweather4-dev dconf-dev libx11-dev gdm-dev geocode-glib-dev polkit-dev elogind-dev"
+makedepends="
+    itstool
+    glib-dev
+    gnome-desktop-dev
+    gdk-pixbuf-dev
+    pango-dev
+    gtk+3.0-dev
+    libwnck3-dev
+    gnome-menus-dev
+    gsettings-desktop-schemas-dev
+    cairo-dev
+    libgweather4-dev
+    dconf-dev
+    libx11-dev
+    gdm-dev
+    geocode-glib-dev
+    polkit-dev
+"
 
 build() {
+    # ZainiumOS/musl does not use GNOME's systemd integration.
+    # Remove the systemd-specific libgnome-desktop header.
+    sed -i \
+        '/#include <libgnome-desktop\/gnome-systemd\.h>/d' \
+        modules/action-button/panel-run-dialog.c
+
     local action_modules="gio-unix-2.0 gtk+-3.0 libgnome-menu-3.0 libelogind x11"
     local launcher_modules="gio-unix-2.0 gtk+-3.0 libgnome-menu-3.0 libelogind"
     local menu_modules="gdm gio-unix-2.0 gtk+-3.0 libgnome-menu-3.0 libelogind"
@@ -28,12 +51,15 @@ build() {
         MENU_LIBS="$(pkg-config --libs $menu_modules)"
 
     make
-    make install DESTDIR="$(pwd)/_zexbuild-install"
+
+    make install \
+        DESTDIR="$(pwd)/_zexbuild-install"
 }
 
 package() {
     local inst="_zexbuild-install/overlayer/syshub"
 
     mkdir -p "$PAYLOAD_DIR"
+
     cp -a "$inst"/. "$PAYLOAD_DIR"/
 }
