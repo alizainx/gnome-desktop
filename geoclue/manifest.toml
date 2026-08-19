@@ -1,0 +1,33 @@
+# manifest.toml - geoclue (syshub tier)
+
+[package]
+name             = "geoclue"
+version          = "2.8.1"
+description      = "Location information D-Bus service"
+license          = "LGPL-2.1-or-later"
+maintainer       = "Ali Zain <alizain@zainiumdynamics.tech>"
+homepage         = "https://gitlab.freedesktop.org/geoclue/geoclue/-/wikis/home"
+build_type       = "dynamic"
+libc_target      = "musl"
+
+blake3           = ""
+ed25519_sig      = ""
+ed25519_pubkey   = ""
+
+depends          = ["glib", "json-glib", "libsoup3", "libnotify", "dbus", "avahi", "modemmanager"]
+provides         = ["geoclue"]
+tags             = ["gnome", "location", "dbus"]
+
+[install]
+bin     = "/overlayer/syshub/bin"
+lib     = "/overlayer/syshub/lib"
+libexec = "/overlayer/syshub/libexec"
+share   = "/overlayer/syshub/share"
+_syshub = true
+
+[remove]
+files    = []
+dirs     = []
+symlinks = []
+
+[hooks]

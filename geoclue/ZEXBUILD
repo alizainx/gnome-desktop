@@ -1,0 +1,56 @@
+maintainer="Ali Zain <alizain@zainiumdynamics.tech>"
+pkgname=geoclue
+pkgver=2.8.1
+pkgrel=0
+# app-misc/geoclue in Gentoo. Not GNOME-hosted - freedesktop.org
+# gitlab releases. No systemd/elogind dependency: meson.build's
+# systemd_unit_dir just defaults to the string 'N/A' when the option
+# is left unset, no dependency('systemd') call anywhere. Confirmed by
+# reading the real meson.build, not guessed. No patch needed.
+source="https://gitlab.freedesktop.org/geoclue/geoclue/-/archive/$pkgver/geoclue-$pkgver.tar.bz2"
+sha256sums="1b5de03936bd8c031a1f6207c1857fa25a9aa1453ffe742f32a0a4a3281f2629  geoclue-$pkgver.tar.bz2"
+# makedepends matched against Alpine's real aports recipe
+# (community/geoclue) - avahi-dev and modemmanager-dev are real apk
+# packages same as every other -dev here (earlier draft's "no
+# modemmanager/avahi recipes yet" reasoning conflated "not our own
+# published Zainium package" with "not available via apk" - every
+# makedepend in this repo is really an Alpine apk stand-in, this is
+# no different), so the modem-backed sources are enabled below to
+# match. gobject-introspection-dev/vala dropped - introspection/vala
+# stay off, same reasoning as every other recipe here.
+makedepends="avahi-dev dbus-dev glib-dev json-glib-dev libnotify-dev libsoup3-dev modemmanager-dev"
+
+build() {
+    meson setup builddir \
+        --prefix=/overlayer/syshub \
+        --libdir=/overlayer/syshub/lib \
+        --includedir=/overlayer/syshub/include \
+        -Dlibgeoclue=true \
+        -Dintrospection=false \
+        -Dvapi=false \
+        -Dgtk-doc=false \
+        -D3g-source=true \
+        -Dcdma-source=true \
+        -Dmodem-gps-source=true \
+        -Dnmea-source=true \
+        -Dcompass=true \
+        -Denable-backend=true \
+        -Ddemo-agent=false \
+        -Ddbus-srv-user=geoclue \
+        -Ddbus-sys-dir=/overlayer/syshub/share/dbus-1/system.d \
+        -Ddefault-wifi-url=https://api.beacondb.net/v1/geolocate \
+        -Ddefault-wifi-submit-url=https://api.beacondb.net/v2/geosubmit
+    ninja -C builddir
+    DESTDIR="$(pwd)/_zexbuild-install" ninja -C builddir install
+}
+
+package() {
+    local inst="_zexbuild-install/overlayer/syshub"
+    mkdir -p "$PAYLOAD_DIR/bin" "$PAYLOAD_DIR/lib" "$PAYLOAD_DIR/libexec" "$PAYLOAD_DIR/share"
+    cp -a "$inst"/bin/. "$PAYLOAD_DIR/bin/" 2>/dev/null || true
+    cp -a "$inst"/lib/. "$PAYLOAD_DIR/lib/" 2>/dev/null || true
+    rm -rf "$PAYLOAD_DIR/lib/pkgconfig"
+    find "$PAYLOAD_DIR/lib" -maxdepth 1 \( -name '*.a' -o -name '*.la' \) -delete
+    cp -a "$inst"/libexec/. "$PAYLOAD_DIR/libexec/" 2>/dev/null || true
+    cp -a "$inst"/share/. "$PAYLOAD_DIR/share/" 2>/dev/null || true
+}
