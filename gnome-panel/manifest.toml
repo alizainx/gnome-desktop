@@ -1,0 +1,33 @@
+# manifest.toml - gnome-panel (syshub tier)
+
+[package]
+name             = "gnome-panel"
+version          = "3.58.1"
+description      = "The GNOME Flashback panel, systemd-optional build (elogind/qlogind)"
+license          = "GPL-2.0-or-later"
+maintainer       = "Ali Zain <alizain@zainiumdynamics.tech>"
+homepage         = "https://gitlab.gnome.org/GNOME/gnome-panel/"
+build_type       = "dynamic"
+libc_target      = "musl"
+
+blake3           = ""
+ed25519_sig      = ""
+ed25519_pubkey   = ""
+
+depends          = ["gnome-desktop", "gdk-pixbuf", "pango", "glib", "gtk3", "libwnck", "gnome-menus", "gsettings-desktop-schemas", "cairo", "libgweather", "dconf", "libx11", "gdm", "geocode-glib", "polkit", "quantra-logind"]
+provides         = ["gnome-panel"]
+tags             = ["gnome", "desktop", "panel", "flashback"]
+
+[install]
+bin     = "/overlayer/syshub/bin"
+lib     = "/overlayer/syshub/lib"
+libexec = "/overlayer/syshub/libexec"
+share   = "/overlayer/syshub/share"
+_syshub = true
+
+[remove]
+files    = []
+dirs     = []
+symlinks = []
+
+[hooks]

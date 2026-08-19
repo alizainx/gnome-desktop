@@ -1,0 +1,10 @@
+--- a/modules/action-button/panel-run-dialog.c
++++ b/modules/action-button/panel-run-dialog.c
+@@ -41,7 +41,6 @@
+ #include <gdk/gdkkeysyms.h>
+ #include <gdk/gdkx.h>
+ #include <gmenu-tree.h>
+-#include <libgnome-desktop/gnome-systemd.h>
+ 
+ #include <libpanel-util/panel-error.h>
+ #include <libpanel-util/panel-glib.h>
