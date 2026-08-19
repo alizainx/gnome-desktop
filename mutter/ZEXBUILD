@@ -1,0 +1,67 @@
+maintainer="Ali Zain <alizain@zainiumdynamics.tech>"
+pkgname=mutter
+pkgver=49.7
+pkgrel=0
+# meson.build: -Dlogind=true makes it try dependency('libsystemd') first,
+# falling back to dependency('libelogind') if that's not found (see
+# meson.build around "have_logind"). We ship no libsystemd.pc, only
+# qlogind's libelogind.pc, so the fallback path is always what's taken.
+# No patch needed, confirmed against the actual meson.build in the
+# tarball, not guessed. Gentoo's x11-wm/mutter-49.7.ebuild sets this
+# exact flag when either USE=elogind or USE=systemd.
+source="https://download.gnome.org/sources/mutter/49/mutter-$pkgver.tar.xz"
+sha256sums="abdd71e2eac66840623aabf4f2a688373f1d49ac4969665836a63df3780685b1  mutter-$pkgver.tar.xz"
+# gnome-settings-daemon and quantra-logind are runtime session
+# companions, not build-time link deps, so they're left out here even
+# though they're in manifest.toml's depends. glycin has no -dev
+# subpackage in Alpine (image-loader plugin consumed at runtime, not
+# linked at build time) - also left out.
+makedepends="glib-dev gtk4.0-dev pango-dev cairo-dev pixman-dev fribidi-dev gsettings-desktop-schemas-dev libxkbcommon-dev at-spi2-core-dev dbus-dev colord-dev lcms2-dev harfbuzz-dev libei-dev libdisplay-info-dev libcanberra-dev mesa-dev wayland-dev gnome-desktop-dev libx11-dev libxcomposite-dev libxcursor-dev libxdamage-dev libxext-dev libxfixes-dev libxi-dev xkeyboard-config libxrandr-dev libxcb-dev libxinerama-dev libxau-dev"
+
+# native_backend/udev/remote_desktop/libwacom/devkit all off: no
+# libgudev/libinput/mesa-gbm/pipewire/libadwaita recipes yet, so this
+# is an X11+nested-Wayland build for now, not a standalone Wayland
+# session - revisit once those land.
+build() {
+    meson setup builddir \
+        --prefix=/overlayer/syshub \
+        --libdir=/overlayer/syshub/lib \
+        --includedir=/overlayer/syshub/include \
+        -Dopengl=true \
+        -Degl=true \
+        -Dglx=true \
+        -Dgles2=true \
+        -Dwayland=true \
+        -Dxwayland=false \
+        -Dx11=true \
+        -Dlogind=true \
+        -Dnative_backend=false \
+        -Dremote_desktop=false \
+        -Dlibgnome_desktop=true \
+        -Dudev=false \
+        -Dlibwacom=false \
+        -Dsound_player=false \
+        -Dstartup_notification=false \
+        -Dintrospection=false \
+        -Ddocs=false \
+        -Dcogl_tests=false \
+        -Dclutter_tests=false \
+        -Dmutter_tests=false \
+        -Dtests=false \
+        -Dkvm_tests=false \
+        -Dtty_tests=false \
+        -Dprofiler=false \
+        -Dinstalled_tests=false \
+        -Dfonts=true \
+        -Dbash_completion=false \
+        -Ddevkit=false \
+        -Degl_device=false \
+        -Dwayland_eglstream=false
+    ninja -C builddir
+    DESTDIR="$(pwd)/_zexbuild-install" ninja -C builddir install
+}
+
+package() {
+    local inst="_zexbuild-install/overlayer/syshub"
+    cp -a "$inst"/. "$PAYLOAD_DIR"/
+}

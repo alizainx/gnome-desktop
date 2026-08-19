@@ -1,0 +1,33 @@
+# manifest.toml - mutter (syshub tier)
+
+[package]
+name             = "mutter"
+version          = "49.7"
+description      = "GNOME compositing window manager, systemd-optional build (elogind/qlogind)"
+license          = "GPL-2.0-or-later"
+maintainer       = "Ali Zain <alizain@zainiumdynamics.tech>"
+homepage         = "https://mutter.gnome.org"
+build_type       = "dynamic"
+libc_target      = "musl"
+
+blake3           = ""
+ed25519_sig      = ""
+ed25519_pubkey   = ""
+
+depends          = ["glib", "gtk4", "pango", "cairo", "pixman", "fribidi", "gsettings-desktop-schemas", "gnome-settings-daemon", "libxkbcommon", "at-spi2-core", "dbus", "colord", "lcms2", "harfbuzz", "libei", "libdisplay-info", "glycin", "libcanberra", "libglvnd", "wayland", "gnome-desktop", "libx11", "libxcomposite", "libxcursor", "libxdamage", "libxext", "libxfixes", "libxi", "xkeyboard-config", "libxrandr", "libxcb", "libxinerama", "libxau", "quantra-logind"]
+provides         = ["libmutter-17.so", "mutter"]
+tags             = ["gnome", "desktop", "wm", "compositor"]
+
+[install]
+bin     = "/overlayer/syshub/bin"
+lib     = "/overlayer/syshub/lib"
+libexec = "/overlayer/syshub/libexec"
+share   = "/overlayer/syshub/share"
+_syshub = true
+
+[remove]
+files    = []
+dirs     = []
+symlinks = []
+
+[hooks]
