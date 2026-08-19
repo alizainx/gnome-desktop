@@ -1,0 +1,31 @@
+# manifest.toml - sushi (syshub tier)
+
+[package]
+name             = "sushi"
+version          = "46.0"
+description      = "Quick file previewer for Nautilus"
+license          = "GPL-2.0-or-later"
+maintainer       = "Ali Zain <alizain@zainiumdynamics.tech>"
+homepage         = "https://gitlab.gnome.org/GNOME/sushi"
+build_type       = "dynamic"
+libc_target      = "musl"
+
+blake3           = ""
+ed25519_sig      = ""
+ed25519_pubkey   = ""
+
+depends          = ["libepoxy", "evince", "freetype", "gdk-pixbuf", "glib", "gstreamer", "gst-plugins-base", "gtk3", "gtksourceview4", "harfbuzz", "gobject-introspection", "gjs", "nautilus", "bubblewrap", "webkit2gtk"]
+provides         = ["sushi"]
+tags             = ["gnome", "nautilus", "preview"]
+
+[install]
+bin     = "/overlayer/syshub/bin"
+share   = "/overlayer/syshub/share"
+_syshub = true
+
+[remove]
+files    = []
+dirs     = []
+symlinks = []
+
+[hooks]
