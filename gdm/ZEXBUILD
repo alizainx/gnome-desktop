@@ -41,10 +41,9 @@ build() {
         -Ddefault-pam-config=exherbo \
         -Dgdm-xsession=true \
         -Dgroup=gdm \
-        -Dipv6=true \
         -Dlibaudit=disabled \
         -Dlogind-provider=elogind \
-        -Dplymouth=disabled \
+        -Dplymouth=enable \
         -Drun-dir=/run/gdm \
         -Dselinux=disabled \
         -Dsystemd-journal=false \
