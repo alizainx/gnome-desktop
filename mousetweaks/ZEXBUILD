@@ -1,0 +1,26 @@
+maintainer="Ali Zain <alizain@zainiumdynamics.tech>"
+pkgname=mousetweaks
+pkgver=3.32.0
+pkgrel=0
+# Autotools (gnome2 eclass upstream), ships a pregenerated ./configure
+# - no autoreconf needed. No systemd/elogind touchpoint (mouse
+# accessibility daemon: dwell-click, secondary-click, on-screen mouse
+# button panel).
+source="https://download.gnome.org/sources/mousetweaks/3.32/mousetweaks-$pkgver.tar.xz"
+sha256sums="0ebd5cdef01547787cbc3697ae758c57db1eec10eab613704d4a17b27685ae00  mousetweaks-$pkgver.tar.xz"
+makedepends="glib-dev gtk+3.0-dev gsettings-desktop-schemas-dev libx11-dev libxtst-dev libxfixes-dev libxcursor-dev"
+
+build() {
+    ./configure \
+        --host="$CHOST" \
+        --prefix=/overlayer/syshub \
+        --libdir=/overlayer/syshub/lib \
+        --disable-static
+    make
+    make DESTDIR="$(pwd)/_zexbuild-install" install
+}
+
+package() {
+    local inst="_zexbuild-install/overlayer/syshub"
+    cp -a "$inst"/. "$PAYLOAD_DIR"/
+}
