@@ -8,7 +8,7 @@ pkgrel=0
 # quantra-logind/librsvg. 1.18.6 is plain C++/meson, no Rust anywhere.
 # No systemd/elogind touchpoint either way.
 source="https://download.gnome.org/sources/gnome-commander/1.18/gnome-commander-$pkgver.tar.xz"
-sha256sums="eb1dfa446f116ef5bf299c0cadf58685292437a70843066fe584e3ad3c957004  gnome-commander-$pkgver.tar.xz"
+sha256sums="ca11736869c3e08aa0a12d8caf1e1ce79679365b177c07eb4ab810cd4da4c8cb  gnome-commander-$pkgver.tar.xz"
 makedepends="glib-dev gtk+3.0-dev gdk-pixbuf-dev"
 
 # Deps this recipe assumes, none published yet: glib, gtk3,
