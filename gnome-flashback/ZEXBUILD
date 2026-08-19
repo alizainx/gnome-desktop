@@ -1,0 +1,54 @@
+maintainer="Ali Zain <alizain@zainiumdynamics.tech>"
+pkgname=gnome-flashback
+pkgver=3.58.0
+pkgrel=0
+# Autotools, not meson - confirmed against the real tarball
+# (configure.ac at the top, no meson.build anywhere). configure.ac's
+# PKG_CHECK_MODULES([DESKTOP], [... libsystemd ...]) and
+# PKG_CHECK_MODULES([SCREENSAVER], [... libsystemd ...]) hardcode the
+# module name "libsystemd" literally - there's no elogind fallback
+# baked into configure.ac itself. Gentoo's own gnome-flashback-3.58.0-r1
+# ebuild works around this without patching configure.ac: PKG_CHECK_MODULES
+# skips running pkg-config at all if <VAR>_CFLAGS/<VAR>_LIBS are already
+# set in the environment, so it pre-computes those two variables against
+# "libelogind" (qlogind's alias) instead and feeds them in directly.
+# Same technique here, no source patch needed. Module lists copied
+# verbatim from the ebuild's src_configure(), which itself notes they
+# must be rechecked against configure.ac on every version bump.
+source="https://download.gnome.org/sources/gnome-flashback/3.58/gnome-flashback-$pkgver.tar.xz"
+sha256sums="aaa23e7042477e741f24279b468b9d20af4ec195ee43b3d312cdaaf84d98c321  gnome-flashback-$pkgver.tar.xz"
+# makedepends matched against Alpine's real aports recipe
+# (community/gnome-flashback) - was missing gdm-dev, gnome-bluetooth-dev,
+# gnome-panel-dev, libxcb-dev, libxext-dev, libxfixes-dev, libxrandr-dev,
+# linux-pam-dev, pulseaudio-dev, upower-dev, xkeyboard-config-dev. These
+# are real apk packages installed at build time regardless of whether we
+# have our own Zainium recipe for them yet, same as everywhere else.
+makedepends="polkit-dev ibus-dev libxkbfile-dev gdk-pixbuf-dev gtk+3.0-dev gnome-desktop-dev libcanberra-dev glib-dev gsettings-desktop-schemas-dev elogind-dev libx11-dev libxxf86vm-dev alsa-lib-dev gdm-dev gnome-bluetooth-dev gnome-panel-dev libxcb-dev libxext-dev libxfixes-dev libxrandr-dev linux-pam-dev pulseaudio-dev upower-dev xkeyboard-config-dev"
+build() {
+    local desktop_modules="glib-2.0 gio-2.0 gio-unix-2.0 gnome-desktop-3.0 gtk+-3.0 libelogind x11"
+    local screensaver_modules="gdm gio-unix-2.0 glib-2.0 gnome-desktop-3.0 gtk+-3.0 libelogind xxf86vm"
+
+    ./configure \
+        --host="$CHOST" \
+        --prefix=/overlayer/syshub \
+        --libdir=/overlayer/syshub/lib \
+        --disable-static \
+        --without-compiz-session \
+        DESKTOP_CFLAGS="$(pkg-config --cflags $desktop_modules)" \
+        DESKTOP_LIBS="$(pkg-config --libs $desktop_modules)" \
+        SCREENSAVER_CFLAGS="$(pkg-config --cflags $screensaver_modules)" \
+        SCREENSAVER_LIBS="$(pkg-config --libs $screensaver_modules)"
+    make
+    make install DESTDIR="$(pwd)/_zexbuild-install"
+}
+
+package() {
+    local inst="_zexbuild-install/overlayer/syshub"
+    mkdir -p "$PAYLOAD_DIR/bin" "$PAYLOAD_DIR/lib" "$PAYLOAD_DIR/libexec" "$PAYLOAD_DIR/share"
+    cp -a "$inst"/bin/. "$PAYLOAD_DIR/bin/" 2>/dev/null || true
+    cp -a "$inst"/lib/. "$PAYLOAD_DIR/lib/" 2>/dev/null || true
+    rm -rf "$PAYLOAD_DIR/lib/pkgconfig"
+    find "$PAYLOAD_DIR/lib" -maxdepth 1 \( -name '*.a' -o -name '*.la' \) -delete
+    cp -a "$inst"/libexec/. "$PAYLOAD_DIR/libexec/" 2>/dev/null || true
+    cp -a "$inst"/share/. "$PAYLOAD_DIR/share/" 2>/dev/null || true
+}
