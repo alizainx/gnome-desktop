@@ -12,7 +12,7 @@ pkgrel=0
 # libelogind.pc alias must therefore also install headers under an
 # elogind/ subdirectory, not just a qlogind/ one, for this include to
 # resolve.
-source="https://download.gnome.org/sources/gnome-shell/49/gnome-shell-$pkgver.tar.xz
+source="https://download.gnome.org/sources/gnome-shell/50/gnome-shell-$pkgver.tar.xz
 0001-shell-elogind-support-to-avoid-stubbed-sd_notify.patch"
 sha256sums="c531939539db316a41aef23670370abd1330d3254f84bcb0f9f4dae5d6e362cf  gnome-shell-$pkgver.tar.xz"
 # Cross-checked against Alpine's own real gnome-shell APKBUILD
