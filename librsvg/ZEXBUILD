@@ -35,6 +35,11 @@ build() {
 
     export RUSTFLAGS="${RUSTFLAGS:-} -C debuginfo=1"
 
+    # Rsvg-2.0's g-ir-scanner dumper carries Zainium's interpreter/
+    # rpath like every other build product - same fix as gnome-shell/
+    # gnome-desktop/gnome-characters's own dumpers.
+    export LD_LIBRARY_PATH="/usr/lib:/lib:${LD_LIBRARY_PATH:-}"
+
     meson setup builddir \
         --prefix=/overlayer/syshub \
         --libdir=/overlayer/syshub/lib \
