@@ -16,7 +16,7 @@ sha256sums="f20518c920e9ea3f9c9b8b44be8c50d8d7feecd0dd5624960f77bd2ca4fbeb9d  gn
 # packages precisely for this split - community/gcr (3.41.2, has
 # gck-1.pc + gcr-base-3.pc) and community/gcr4 (4.x, gcr-4.pc only).
 # gcr4-dev would configure-fail here; gcr-dev is the real match.
-makedepends="glib-dev gcr-dev libgcrypt-dev p11-kit-dev"
+makedepends="openssh-client libcap-ng-dev glib-dev gcr-dev libgcrypt-dev p11-kit-dev"
 
 # Deps this recipe assumes, none published yet: glib, gcr, libgcrypt,
 # p11-kit. Will not configure until these exist. caps (libcap-ng) and
