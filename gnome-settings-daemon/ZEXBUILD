@@ -29,6 +29,8 @@ fontconfig-dev \
 networkmanager-dev"
 
 build() {
+    export LD_LIBRARY_PATH="/overlayer/syshub/lib:/usr/lib:/lib"
+
     meson setup builddir \
         --prefix=/overlayer/syshub \
         --libdir=/overlayer/syshub/lib \
