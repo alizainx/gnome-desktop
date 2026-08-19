@@ -1,0 +1,68 @@
+maintainer="Ali Zain <alizain@zainiumdynamics.tech>"
+pkgname=gdm
+pkgver=50.2
+pkgrel=0
+# -Dlogind-provider=elogind: real meson option in gdm's meson.build,
+# confirmed against Gentoo's gnome-base/gdm-49.4.ebuild
+# ($(usex systemd systemd elogind)). Satisfied by qlogind's
+# libelogind.pc alias, no source patch needed. With elogind chosen,
+# also drop the systemd unit dirs and start on vt7 like the ebuild
+# does (systemd path starts on vt1, plymouth handles vt1 there instead).
+#
+# Gentoo carries several FILESDIR patches (gdm-49.2-display-reference,
+# gdm-49.2-boot_display-sysfs, gdm-49.2-XDG_SESSION_EXTRA_DEVICE_ACCESS,
+# gdm-pam-openrc) but all of them are upstream bugfixes or OpenRC/PAM
+# config wiring, nothing to do with elogind/musl - out of scope here,
+# not carried.
+source="https://download.gnome.org/sources/gdm/50/gdm-$pkgver.tar.xz"
+sha256sums="8a4679e47cddfe8b0a1bd9d3836042deb68fb3e1b0e7e62dfd0631dc5b6fc541  gdm-$pkgver.tar.xz"
+makedepends="itstool glib-dev libgudev-dev dconf-dev dbus-dev gtk+3.0-dev libcanberra-dev accountsservice-dev keyutils-dev json-glib-dev gobject-introspection-dev eudev-dev linux-pam-dev elogind-dev polkit-dev libx11-dev libxau-dev libxcb-dev xorg-server-dev plymouth-dev gettext"
+# Deps this recipe assumes, none published yet: glib, libgudev, dconf,
+# gnome-settings-daemon, gsettings-desktop-schemas, dbus, gtk (X11
+# gtk+-3 build-checked), accountsservice, keyutils, json-glib,
+# gobject-introspection, and virtual/udev. No PAM stack packaged yet
+# either - gdm hard-depends on it (login manager), listed anyway.
+# gdm will not configure until these exist.
+#
+# libx11-dev/libxau-dev/libxcb-dev: meson.build's `if have_x11_support`
+# block (our -Dx11-support=true) unconditionally does dependency('x11'),
+# dependency('xau'), dependency('xcb') - missing before. gettext:
+# po/meson.build calls i18n.gettext() unconditionally, needing
+# msgfmt/xgettext at build time - also missing. (itstool, listed in
+# Alpine's own gdm makedepends, is for their older 48.0; no itstool/
+# merge_file call anywhere in 49.4's meson.build tree - not needed.)
+build() {
+    export LD_LIBRARY_PATH="/usr/lib:/lib:/overlayer/syshub/lib:/overlayer/syshub/lib64"
+    meson setup builddir \
+        --prefix=/overlayer/syshub \
+        --libdir=/overlayer/syshub/lib \
+        --includedir=/overlayer/syshub/include \
+        --localstatedir=/overlayer/syshub/var \
+        -Ddefault-pam-config=exherbo \
+        -Dgdm-xsession=true \
+        -Dgroup=gdm \
+        -Dlibaudit=disabled \
+        -Dlogind-provider=elogind \
+        -Dplymouth=auto \
+        -Drun-dir=/run/gdm \
+        -Dselinux=disabled \
+        -Dsystemd-journal=false \
+        -Dx11-support=true \
+        -Dinitial-vt=7 \
+        -Dsystemdsystemunitdir=no \
+        -Dsystemduserunitdir=no
+    ninja -C builddir
+    DESTDIR="$(pwd)/_zexbuild-install" ninja -C builddir install
+}
+
+package() {
+    local inst="_zexbuild-install/overlayer/syshub"
+    mkdir -p "$PAYLOAD_DIR/bin" "$PAYLOAD_DIR/lib" "$PAYLOAD_DIR/libexec" "$PAYLOAD_DIR/share" "$PAYLOAD_DIR/etc"
+    cp -a "$inst"/bin/. "$PAYLOAD_DIR/bin/" 2>/dev/null || true
+    cp -a "$inst"/lib/. "$PAYLOAD_DIR/lib/" 2>/dev/null || true
+    rm -rf "$PAYLOAD_DIR/lib/pkgconfig"
+    find "$PAYLOAD_DIR/lib" -maxdepth 1 \( -name '*.a' -o -name '*.la' \) -delete
+    cp -a "$inst"/libexec/. "$PAYLOAD_DIR/libexec/" 2>/dev/null || true
+    cp -a "$inst"/share/. "$PAYLOAD_DIR/share/" 2>/dev/null || true
+    cp -a "$inst"/etc/. "$PAYLOAD_DIR/etc/" 2>/dev/null || true
+}
