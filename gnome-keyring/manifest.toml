@@ -1,0 +1,33 @@
+# manifest.toml - gnome-keyring (syshub tier)
+
+[package]
+name             = "gnome-keyring"
+version          = "48.0"
+description      = "Password and keyring managing daemon, systemd optional (plain feature, no elogind fallback)"
+license          = "GPL-2.0-or-later"
+maintainer       = "Ali Zain <alizain@zainiumdynamics.tech>"
+homepage         = "https://gitlab.gnome.org/GNOME/gnome-keyring"
+build_type       = "dynamic"
+libc_target      = "musl"
+
+blake3           = ""
+ed25519_sig      = ""
+ed25519_pubkey   = ""
+
+depends          = ["glib", "gcr", "libgcrypt", "p11-kit"]
+provides         = ["gnome-keyring"]
+tags             = ["gnome", "keyring", "security"]
+
+[install]
+bin     = "/overlayer/syshub/bin"
+lib     = "/overlayer/syshub/lib"
+libexec = "/overlayer/syshub/libexec"
+share   = "/overlayer/syshub/share"
+_syshub = true
+
+[remove]
+files    = []
+dirs     = []
+symlinks = []
+
+[hooks]
