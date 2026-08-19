@@ -15,7 +15,7 @@ sha256sums="a21f825bd44afc4dd99ba4eea8ff57c8f2e51085cb402a68ed4cbb35299826a4  gt
 # Trimmed from Alpine's own real gtk4.0 APKBUILD makedepends to what
 # our -D... flags below still enable (introspection/cups/gstreamer/
 # vulkan/docs/broadway all disabled here).
-makedepends="glib-dev cairo-dev pango-dev fribidi-dev harfbuzz-dev gdk-pixbuf-dev libpng-dev tiff-dev libjpeg-turbo-dev librsvg-dev libepoxy-dev graphene-dev iso-codes-dev shared-mime-info wayland-dev libxkbcommon-dev mesa-dev libx11-dev libxi-dev libxext-dev libxrandr-dev libxcursor-dev libxfixes-dev libxdamage-dev libxinerama-dev fontconfig-dev"
+makedepends="glib-dev cairo-dev pango-dev fribidi-dev harfbuzz-dev gdk-pixbuf-dev libpng-dev tiff-dev libjpeg-turbo-dev librsvg-dev libepoxy-dev graphene-dev iso-codes-dev shared-mime-info wayland-dev wayland-protocols libxkbcommon-dev mesa-dev libx11-dev libxi-dev libxext-dev libxrandr-dev libxrender-dev libxcursor-dev libxfixes-dev libxdamage-dev libxinerama-dev fontconfig-dev"
 
 # Deps this recipe assumes, none published yet: glib, cairo, pango,
 # fribidi, harfbuzz, gdk-pixbuf, libpng, tiff, libjpeg-turbo, librsvg,
