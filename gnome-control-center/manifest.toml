@@ -1,0 +1,33 @@
+# manifest.toml - gnome-control-center (syshub tier)
+
+[package]
+name             = "gnome-control-center"
+version          = "49.9"
+description      = "GNOME's main interface to configure various aspects of the desktop"
+license          = "GPL-2.0-or-later"
+maintainer       = "Ali Zain <alizain@zainiumdynamics.tech>"
+homepage         = "https://apps.gnome.org/Settings"
+build_type       = "dynamic"
+libc_target      = "musl"
+
+blake3           = ""
+ed25519_sig      = ""
+ed25519_pubkey   = ""
+
+depends          = ["glib", "gtk4", "libadwaita", "accountsservice", "colord", "gdk-pixbuf", "gnome-desktop", "gsettings-desktop-schemas", "libxml2", "upower", "libgudev", "gcr", "libpwquality", "polkit", "cairo", "colord-gtk", "fontconfig", "libgtop", "udisks", "libsecret", "gnutls", "gsound", "pango", "networkmanager", "gnome-bluetooth", "mit-krb5", "libwacom", "cups", "samba", "gnome-online-accounts", "gnome-settings-daemon"]
+provides         = ["gnome-control-center"]
+tags             = ["gnome", "desktop", "settings"]
+
+[install]
+bin     = "/overlayer/syshub/bin"
+lib     = "/overlayer/syshub/lib"
+libexec = "/overlayer/syshub/libexec"
+share   = "/overlayer/syshub/share"
+_syshub = true
+
+[remove]
+files    = []
+dirs     = []
+symlinks = []
+
+[hooks]
