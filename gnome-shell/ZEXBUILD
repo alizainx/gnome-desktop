@@ -83,14 +83,17 @@ package() {
     mkdir -p "$PAYLOAD_DIR"
     cp -a "$inst"/. "$PAYLOAD_DIR"/
 
-    # ZainiumOS has no /usr hierarchy.
-    # GNOME Shell installs D-Bus service files with Alpine/FHS
-    # /usr/bin/gjs references; rewrite them to the ZainiumOS path.
-    find "$PAYLOAD_DIR/share/dbus-1/services" \
-        -type f -name '*.service' \
-        -exec sed -i \
-        's#Exec=/usr/bin/gjs#Exec=/overlayer/syshub/bin/gjs#g' \
-        {} +
+    # ZainiumOS has no /usr hierarchy. --strip (above) handles the
+    # compiled .so's debug-info /usr/include/... remnants; everything
+    # else left with a literal /usr/ reference at this point is a text
+    # file gnome-shell's build baked Alpine/FHS paths into (D-Bus
+    # service Exec= lines, gjs/python3 shebangs on installed scripts,
+    # perf-background.xml's stock wallpaper path) - blanket-rewrite
+    # every text file's /usr/ to /overlayer/syshub/ rather than chase
+    # each one by name.
+    grep -RIl '/usr/' "$PAYLOAD_DIR" 2>/dev/null | while IFS= read -r f; do
+        sed -i 's#/usr/#/overlayer/syshub/#g' "$f"
+    done
 
     # Verify that no forbidden /usr references remain in payload text.
     # (--strip on the meson setup above removes the debug-info string
