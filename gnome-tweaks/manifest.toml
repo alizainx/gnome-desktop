@@ -1,0 +1,31 @@
+# manifest.toml - gnome-tweaks (syshub tier)
+
+[package]
+name             = "gnome-tweaks"
+version          = "49.0"
+description      = "Customize advanced GNOME options"
+license          = "GPL-3.0-or-later"
+maintainer       = "Ali Zain <alizain@zainiumdynamics.tech>"
+homepage         = "https://gitlab.gnome.org/GNOME/gnome-tweaks"
+build_type       = "dynamic"
+libc_target      = "musl"
+
+blake3           = ""
+ed25519_sig      = ""
+ed25519_pubkey   = ""
+
+depends          = ["python3", "pygobject", "gsettings-desktop-schemas", "gnome-settings-daemon", "glib", "gobject-introspection", "gtk4", "libadwaita", "libgudev", "gnome-desktop", "libnotify", "pango", "mutter", "gnome-shell", "sound-theme-freedesktop"]
+provides         = ["gnome-tweaks"]
+tags             = ["gnome", "settings", "app"]
+
+[install]
+bin     = "/overlayer/syshub/bin"
+share   = "/overlayer/syshub/share"
+_syshub = true
+
+[remove]
+files    = []
+dirs     = []
+symlinks = []
+
+[hooks]
