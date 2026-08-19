@@ -16,8 +16,7 @@ pkgrel=0
 # not carried.
 source="https://download.gnome.org/sources/gdm/50/gdm-$pkgver.tar.xz"
 sha256sums="8a4679e47cddfe8b0a1bd9d3836042deb68fb3e1b0e7e62dfd0631dc5b6fc541  gdm-$pkgver.tar.xz"
-makedepends="itstool glib-dev libgudev-dev dconf-dev dbus-dev gtk+3.0-dev accountsservice-dev keyutils-dev json-glib-dev gobject-introspection-dev eudev-dev linux-pam-dev elogind-dev libx11-dev libxau-dev libxcb-dev gettext"
-
+makedepends="glib-dev libgudev-dev dconf-dev dbus-dev gtk+3.0-dev libcanberra-dev accountsservice-dev keyutils-dev json-glib-dev gobject-introspection-dev eudev-dev linux-pam-dev elogind-dev polkit-dev libx11-dev libxau-dev libxcb-dev xorg-server-dev plymouth-dev gettext"
 # Deps this recipe assumes, none published yet: glib, libgudev, dconf,
 # gnome-settings-daemon, gsettings-desktop-schemas, dbus, gtk (X11
 # gtk+-3 build-checked), accountsservice, keyutils, json-glib,
