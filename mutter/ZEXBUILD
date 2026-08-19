@@ -1,0 +1,54 @@
+maintainer="Ali Zain <alizain@zainiumdynamics.tech>"
+pkgname=mutter
+pkgver=50.4
+pkgrel=0
+# meson.build: -Dlogind=true makes it try dependency('libsystemd') first,
+# falling back to dependency('libelogind') if that's not found (see
+# meson.build around "have_logind"). We ship no libsystemd.pc, only
+# qlogind's libelogind.pc, so the fallback path is always what's taken.
+# No patch needed, confirmed against the actual meson.build in the
+# tarball, not guessed. Gentoo's x11-wm/mutter-49.7.ebuild sets this
+# exact flag when either USE=elogind or USE=systemd.
+source="https://download.gnome.org/sources/mutter/50/mutter-$pkgver.tar.xz"
+sha256sums="273d33c875abcb4b6cbea3f4ec045d18155fbc510c3521fc7e47926371310988  mutter-$pkgver.tar.xz"
+# gnome-settings-daemon and quantra-logind are runtime session
+# companions, not build-time link deps, so they're left out here even
+# though they're in manifest.toml's depends.
+#
+# Corrected: meson.build's dependency('glycin-2', ...) is unconditional
+# (no fallback, no option gate) - Alpine DOES ship a -dev subpackage
+# for this (community/libglycin -> libglycin-dev); our old comment
+# claiming otherwise was wrong. -Dwayland=true also unconditionally
+# pulls in libdrm ("if have_wayland or have_native_backend" in
+# meson.build) and wayland-protocols (data-only pkg, separate from
+# wayland-dev's libs) - both were missing too.
+makedepends="glib-dev gtk4.0-dev pango-dev cairo-dev pixman-dev py3-argcomplete fribidi-dev gsettings-desktop-schemas-dev libxkbcommon-dev at-spi2-core-dev dbus-dev colord-dev lcms2-dev harfbuzz-dev libei-dev libdisplay-info-dev libcanberra-dev libglycin-dev libdrm-dev mesa-dev wayland-dev wayland-protocols gnome-desktop-dev xkeyboard-config libgudev-dev libinput-dev eudev-dev elogind-dev libwacom-dev startup-notification-dev xwayland-dev graphene-dev gdk-pixbuf-dev bash-completion py3-docutils"
+# makedepends block above (mutter can no longer run as an X server or
+# a WM inside one). -Dnative_backend=true is required for this to
+# actually start standalone (DRM/KMS via libdrm, input via libinput,
+# device enumeration via libgudev/eudev) - without it and without X11
+# there would be no backend at all. -Dxwayland stays false: that's the
+# separate X11-app-compat layer inside a Wayland session, not
+# mutter-as-X-server, and no Xwayland recipe exists yet either.
+build() {
+    export LD_LIBRARY_PATH="/usr/lib:/lib:/overlayer/syshub/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
+
+    meson setup builddir \
+        --prefix=/overlayer/syshub \
+        --libdir=/overlayer/syshub/lib \
+        --includedir=/overlayer/syshub/include \
+        -Dudev=true \
+        -Dnative_backend=true \
+        -Dremote_desktop=false \
+        -Dprofiler=false \
+        -Ddevkit=disabled \
+        -Dtests=disabled \
+        -Dlogind=true
+    ninja -C builddir
+    DESTDIR="$(pwd)/_zexbuild-install" ninja -C builddir install
+}
+
+package() {
+    local inst="_zexbuild-install/overlayer/syshub"
+    cp -a "$inst"/. "$PAYLOAD_DIR"/
+}
