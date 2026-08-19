@@ -1,0 +1,37 @@
+maintainer="Ali Zain <alizain@zainiumdynamics.tech>"
+pkgname=gnome-browser-connector
+pkgver=42.1
+pkgrel=0
+# Meson, Python (pygobject) native-messaging host for the GNOME Shell
+# browser-integration extension. No systemd/elogind touchpoint. Carries
+# one patch, same one Gentoo carries: meson.build calls
+# contrib/merge_json.py as a bare relative-path executable during
+# `meson compile`, which breaks on any build where cwd isn't the
+# source root (true of every cross/out-of-tree build, not a
+# musl-specific issue) - upstream fix is to invoke it via the
+# discovered python interpreter instead. Confirmed still needed as of
+# 42.1, not fixed upstream in-tree.
+source="https://download.gnome.org/sources/gnome-browser-connector/42/gnome-browser-connector-$pkgver.tar.xz
+0001-python-path.patch"
+sha256sums="bd9702ce1c163606ca32b8c13d1f3ba6e82b247cf87aac60610b411df1556212  gnome-browser-connector-$pkgver.tar.xz"
+makedepends="python3 py3-gobject3 glib-dev"
+
+# Deps this recipe assumes, none published yet: python3, pygobject,
+# gnome-shell.
+build() {
+    patch -p1 < ../0001-python-path.patch
+
+    meson setup builddir \
+        --prefix=/overlayer/syshub \
+        --libdir=/overlayer/syshub/lib \
+        --includedir=/overlayer/syshub/include
+    ninja -C builddir
+    DESTDIR="$(pwd)/_zexbuild-install" ninja -C builddir install
+}
+
+package() {
+    local inst="_zexbuild-install/overlayer/syshub"
+    mkdir -p "$PAYLOAD_DIR/bin" "$PAYLOAD_DIR/share"
+    cp -a "$inst"/bin/. "$PAYLOAD_DIR/bin/" 2>/dev/null || true
+    cp -a "$inst"/share/. "$PAYLOAD_DIR/share/" 2>/dev/null || true
+}
