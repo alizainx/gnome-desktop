@@ -1,0 +1,33 @@
+# manifest.toml - gnome-flashback (syshub tier)
+
+[package]
+name             = "gnome-flashback"
+version          = "3.58.0"
+description      = "GNOME Flashback session, systemd-optional build (elogind/qlogind)"
+license          = "GPL-3.0-or-later"
+maintainer       = "Ali Zain <alizain@zainiumdynamics.tech>"
+homepage         = "https://gitlab.gnome.org/GNOME/gnome-flashback/"
+build_type       = "dynamic"
+libc_target      = "musl"
+
+blake3           = ""
+ed25519_sig      = ""
+ed25519_pubkey   = ""
+
+depends          = ["gdk-pixbuf", "gtk3", "gnome-desktop", "gnome-panel", "libcanberra", "glib", "gsettings-desktop-schemas", "polkit", "ibus", "upower", "libx11", "gnome-bluetooth", "libpulse", "alsa-lib", "pam", "gdm", "metacity", "gnome-settings-daemon", "tecla", "quantra-logind"]
+provides         = ["gnome-flashback"]
+tags             = ["gnome", "desktop", "session", "flashback"]
+
+[install]
+bin     = "/overlayer/syshub/bin"
+lib     = "/overlayer/syshub/lib"
+libexec = "/overlayer/syshub/libexec"
+share   = "/overlayer/syshub/share"
+_syshub = true
+
+[remove]
+files    = []
+dirs     = []
+symlinks = []
+
+[hooks]
