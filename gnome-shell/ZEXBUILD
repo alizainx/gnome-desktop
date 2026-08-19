@@ -1,38 +1,39 @@
 maintainer="Ali Zain <alizain@zainiumdynamics.tech>"
+
 pkgname=gnome-shell
 pkgver=50.4
 pkgrel=0
-# 0001-shell-elogind-support-to-avoid-stubbed-sd_notify.patch: real
-# upstream-style patch (Swagtoy, carried by Gentoo's gnome-shell
-# ebuild). With -Dsystemd=false, meson.build falls back to
-# dependency('libelogind', required: false) and defines HAVE_ELOGIND,
-# which src/shell-util.c then uses for a real sd_notify/sd_notifyf
-# instead of the no-op stub. Confirmed against the patch itself:
-# `#include <elogind/sd-daemon.h>` when HAVE_ELOGIND is set. qlogind's
-# libelogind.pc alias must therefore also install headers under an
-# elogind/ subdirectory, not just a qlogind/ one, for this include to
-# resolve.
+
 source="https://download.gnome.org/sources/gnome-shell/50/gnome-shell-$pkgver.tar.xz
 0001-shell-elogind-support-to-avoid-stubbed-sd_notify.patch"
-sha256sums="c531939539db316a41aef23670370abd1330d3254f84bcb0f9f4dae5d6e362cf  gnome-shell-$pkgver.tar.xz"
-# Cross-checked against Alpine's own real gnome-shell APKBUILD
-# makedepends, trimmed of networkmanager-dev/libnma-dev (we build with
-# -Dnetworkmanager=false) and gnome-bluetooth/gnome-control-center/
-# tecla (no manifest dependency on those). sassc kept unconditionally -
-# gnome-shell's build always compiles its scss stylesheet with it,
-# not gated behind any meson option.
-#
-# libx11-dev/libxext-dev/libxfixes-dev: not in Alpine's own gnome-shell
-# makedepends at all, but meson.build reads have_x11/have_x11_client
-# straight off mutter_dep's pkg-config variables - `if have_x11_client
-# or have_x11: dependency('x11'); dependency('xext'); dependency('xfixes')`.
-# Our mutter recipe builds with -Dx11=true, so this branch is always
-# taken here even though it's undeclared in our own -D... flags below.
-makedepends="elogind-dev mutter-dev evolution-data-server-dev gcr4-dev gjs-dev gnome-autoar-dev gnome-desktop-dev gobject-introspection-dev gstreamer-dev gtk4.0-dev ibus-dev json-glib-dev libcanberra-dev libxml2-dev libx11-dev libxext-dev libxfixes-dev mutter-dev pipewire-dev polkit-dev pulseaudio-dev sassc startup-notification-dev"
 
-# Not published yet: mutter, gjs, gtk4, gnome-desktop, gnome-autoar,
-# json-glib, ibus, pipewire, networkmanager. Will not configure until
-# those exist.
+sha256sums="c531939539db316a41aef23670370abd1330d3254f84bcb0f9f4dae5d6e362cf  gnome-shell-$pkgver.tar.xz"
+
+makedepends="
+    elogind-dev
+    mutter-dev
+    evolution-data-server-dev
+    gcr4-dev
+    gjs-dev
+    gnome-autoar-dev
+    gnome-desktop-dev
+    gobject-introspection-dev
+    gstreamer-dev
+    gtk4.0-dev
+    ibus-dev
+    json-glib-dev
+    libcanberra-dev
+    libxml2-dev
+    libx11-dev
+    libxext-dev
+    libxfixes-dev
+    pipewire-dev
+    polkit-dev
+    pulseaudio-dev
+    sassc
+    startup-notification-dev
+"
+
 build() {
     patch -p1 < ../0001-shell-elogind-support-to-avoid-stubbed-sd_notify.patch
 
@@ -49,12 +50,42 @@ build() {
         -Dtests=false \
         -Dnetworkmanager=false \
         -Dportal_helper=false
+
+    echo "=== CHECK MUTTER ==="
+    find /usr /overlayer/syshub \
+        -name 'libmutter-cogl-18.so*' \
+        -print 2>/dev/null || true
+
+    echo "=== CHECK GLIB ==="
+    find /usr /overlayer/syshub \
+        -name 'libglib-2.0.so*' \
+        -print 2>/dev/null || true
+
+    echo "=== CHECK GOBJECT ==="
+    find /usr /overlayer/syshub \
+        -name 'libgobject-2.0.so*' \
+        -print 2>/dev/null || true
+
+    echo "=== CHECK GRAPHENE ==="
+    find /usr /overlayer/syshub \
+        -name 'libgraphene-1.0.so*' \
+        -print 2>/dev/null || true
+
+    echo "=== CHECK EGL ==="
+    find /usr /overlayer/syshub \
+        -name 'libEGL.so*' \
+        -print 2>/dev/null || true
+
     ninja -C builddir
-    DESTDIR="$(pwd)/_zexbuild-install" ninja -C builddir install
+
+    DESTDIR="$(pwd)/_zexbuild-install" \
+        ninja -C builddir install
 }
 
 package() {
     local inst="_zexbuild-install/overlayer/syshub"
+
     mkdir -p "$PAYLOAD_DIR"
+
     cp -a "$inst"/. "$PAYLOAD_DIR"/
 }
