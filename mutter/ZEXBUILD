@@ -22,7 +22,7 @@ sha256sums="273d33c875abcb4b6cbea3f4ec045d18155fbc510c3521fc7e47926371310988  mu
 # pulls in libdrm ("if have_wayland or have_native_backend" in
 # meson.build) and wayland-protocols (data-only pkg, separate from
 # wayland-dev's libs) - both were missing too.
-makedepends="glib-dev gtk4.0-dev pango-dev cairo-dev pixman-dev fribidi-dev gsettings-desktop-schemas-dev libxkbcommon-dev at-spi2-core-dev dbus-dev colord-dev lcms2-dev harfbuzz-dev libei-dev libdisplay-info-dev libcanberra-dev libglycin-dev libdrm-dev mesa-dev wayland-dev wayland-protocols gnome-desktop-dev xkeyboard-config libgudev-dev libinput-dev eudev-dev elogind-dev libwacom-dev startup-notification-dev xwayland-dev graphene-dev gdk-pixbuf-dev atk-dev py3-argcomplete bash-completion"
+makedepends="glib-dev gtk4.0-dev pango-dev cairo-dev pixman-dev py3-argcomplete fribidi-dev gsettings-desktop-schemas-dev libxkbcommon-dev at-spi2-core-dev dbus-dev colord-dev lcms2-dev harfbuzz-dev libei-dev libdisplay-info-dev libcanberra-dev libglycin-dev libdrm-dev mesa-dev wayland-dev wayland-protocols gnome-desktop-dev xkeyboard-config libgudev-dev libinput-dev eudev-dev elogind-dev libwacom-dev startup-notification-dev xwayland-dev graphene-dev gdk-pixbuf-dev atk-dev py3-argcomplete bash-completion"
 # makedepends block above (mutter can no longer run as an X server or
 # a WM inside one). -Dnative_backend=true is required for this to
 # actually start standalone (DRM/KMS via libdrm, input via libinput,
