@@ -138,15 +138,23 @@ export LDFLAGS="${LDFLAGS:-} -Wl,-dynamic-linker=$ZAINIUM_LDSO -Wl,-rpath=/overl
 export CARGO_TARGET_X86_64_UNKNOWN_LINUX_MUSL_RUSTFLAGS="${CARGO_TARGET_X86_64_UNKNOWN_LINUX_MUSL_RUSTFLAGS:-} -C link-arg=-Wl,-dynamic-linker=$ZAINIUM_LDSO -C link-arg=-Wl,-rpath=/overlayer/syshub/lib"
 
 # Some builds run their own just-compiled tool mid-build (wayland's
-# wayland-scanner generating protocol headers, e.g.) — that tool now
-# carries Zainium's interpreter/rpath too, so it needs its *other*
-# runtime libs (not just musl) to already exist under
-# /overlayer/syshub/lib, same problem the gcc-musl/libzstd bootstrap
-# above solves. Same justification: musl's ABI is stable across
-# independent builds of the same libc, so borrowing Alpine's own copy
-# of a plain C library is safe. Extend this list as new build-time
-# tools surface a new missing one.
-for lib in libz.so.1 liblzma.so.5 libexpat.so.1 libxml2.so.2; do
+# wayland-scanner generating protocol headers, gnome-shell's g-ir-scanner
+# dumper binary that introspects St/Shell/etc against mutter-dev's real
+# libmutter-clutter/cogl, e.g.) — that tool now carries Zainium's
+# interpreter/rpath too, so it needs its *other* runtime libs (not just
+# musl) to already exist under /overlayer/syshub/lib, same problem the
+# gcc-musl/libzstd bootstrap above solves. Same justification: these
+# libs' ABI is stable across independent builds, so borrowing Alpine's
+# own copy is safe for a build-time-only tool that never ships in any
+# payload. Extend this list as new build-time tools surface a new
+# missing one (glib/gobject/gio/pango/cairo/graphene/atk/lcms2/EGL
+# below cover g-ir-scanner's own dumper binaries).
+for lib in libz.so.1 liblzma.so.5 libexpat.so.1 libxml2.so.2 \
+    libglib-2.0.so.0 libgobject-2.0.so.0 libgmodule-2.0.so.0 libgio-2.0.so.0 \
+    libpango-1.0.so.0 libpangocairo-1.0.so.0 libcairo.so.2 libcairo-gobject.so.2 \
+    libgraphene-1.0.so.0 libatk-1.0.so.0 liblcms2.so.2 libEGL.so.1 \
+    libharfbuzz.so.0 libfribidi.so.0 libpixman-1.so.0 libpng16.so.16 \
+    libfontconfig.so.1 libfreetype.so.6; do
     [ -e "/overlayer/syshub/lib/$lib" ] && continue
     src="$(find /usr/lib /lib -maxdepth 1 -name "$lib" 2>/dev/null | head -1)"
     [ -n "$src" ] || continue
