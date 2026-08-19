@@ -1,0 +1,32 @@
+maintainer="Ali Zain <alizain@zainiumdynamics.tech>"
+pkgname=gnome-calendar
+pkgver=49.1
+pkgrel=0
+# Meson, C. No systemd/elogind touchpoint - confirmed against
+# meson_options.txt directly (no such option exists at all). No
+# patch needed.
+source="https://download.gnome.org/sources/gnome-calendar/49/gnome-calendar-$pkgver.tar.xz"
+sha256sums="0c1115ab294d532c4c19f56ce0d7aee53f8ea32b1430209dd1d9eda47a83d2c2  gnome-calendar-$pkgver.tar.xz"
+# makedepends matched against Alpine's real aports recipe
+# (community/gnome-calendar) - was missing blueprint-compiler and
+# geocode-glib-dev.
+makedepends="libical-dev gsettings-desktop-schemas-dev evolution-data-server-dev libsoup3-dev libadwaita-dev glib-dev gtk4.0-dev libgweather4-dev geoclue-dev geocode-glib-dev blueprint-compiler"
+
+# Deps this recipe assumes, none published yet: libical, gsettings-
+# desktop-schemas, evolution-data-server, libsoup3, libadwaita, glib,
+# gtk4, libgweather, geoclue.
+build() {
+    meson setup builddir \
+        --prefix=/overlayer/syshub \
+        --libdir=/overlayer/syshub/lib \
+        --includedir=/overlayer/syshub/include
+    ninja -C builddir
+    DESTDIR="$(pwd)/_zexbuild-install" ninja -C builddir install
+}
+
+package() {
+    local inst="_zexbuild-install/overlayer/syshub"
+    mkdir -p "$PAYLOAD_DIR/bin" "$PAYLOAD_DIR/share"
+    cp -a "$inst"/bin/. "$PAYLOAD_DIR/bin/" 2>/dev/null || true
+    cp -a "$inst"/share/. "$PAYLOAD_DIR/share/" 2>/dev/null || true
+}
