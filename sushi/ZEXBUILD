@@ -17,6 +17,11 @@ sha256sums="96085baaa430ab2142c606aab5c47e2fbb2fd3eb70a352137e65c59a58a0f2c6  su
 makedepends="evince-dev freetype-dev gdk-pixbuf-dev gjs-dev glib-dev gobject-introspection-dev gst-plugins-base-dev gstreamer-dev gtk+3.0-dev gtksourceview4-dev harfbuzz-dev libepoxy-dev webkit2gtk-4.1-dev"
 
 build() {
+    # Sushi-1.0's g-ir-scanner dumper carries Zainium's interpreter/
+    # rpath like every other build product - same fix as gnome-shell/
+    # librsvg/gnome-characters's own dumpers.
+    export LD_LIBRARY_PATH="/usr/lib:/lib:${LD_LIBRARY_PATH:-}"
+
     meson setup builddir \
         --prefix=/overlayer/syshub \
         --libdir=/overlayer/syshub/lib \
