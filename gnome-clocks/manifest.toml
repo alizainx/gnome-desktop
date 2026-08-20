@@ -1,0 +1,31 @@
+# manifest.toml - gnome-clocks (syshub tier)
+
+[package]
+name             = "gnome-clocks"
+version          = "49.0"
+description      = "Clocks application for GNOME (world clock, alarms, stopwatch, timer)"
+license          = "GPL-2.0-or-later"
+maintainer       = "Ali Zain <alizain@zainiumdynamics.tech>"
+homepage         = "https://apps.gnome.org/Clocks/"
+build_type       = "dynamic"
+libc_target      = "musl"
+
+blake3           = ""
+ed25519_sig      = ""
+ed25519_pubkey   = ""
+
+depends          = ["glib", "gtk4", "libgweather", "gnome-desktop", "geocode-glib", "geoclue", "libadwaita", "gsound"]
+provides         = ["gnome-clocks"]
+tags             = ["gnome", "clock", "app"]
+
+[install]
+bin     = "/overlayer/syshub/bin"
+share   = "/overlayer/syshub/share"
+_syshub = true
+
+[remove]
+files    = []
+dirs     = []
+symlinks = []
+
+[hooks]
