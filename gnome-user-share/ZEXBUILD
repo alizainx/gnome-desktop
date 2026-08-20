@@ -1,0 +1,65 @@
+maintainer="Ali Zain <alizain@zainiumdynamics.tech>"
+pkgname=gnome-user-share
+pkgver=47.2
+pkgrel=0
+# Meson, C. Deliberately pinned before the version that added a Rust
+# component (48+ links a small Rust helper via cargo, needing crate
+# vendoring - same unresolved Rust CI plumbing blocker as
+# quantra-logind/librsvg/gnome-commander). 47.2 is plain C/meson.
+#
+# -Dsystemduserunitdir: meson_options.txt has no elogind-vs-systemd
+# switch, it always wants a systemd user unit directory string to
+# install the WebDAV share user service into. Passed a dummy path
+# under our own prefix, same "-Dsystemdsystemunitdir dummy path only"
+# pattern already used for upower in this repo - the .service file
+# that lands there is inert without an active systemd/logind session
+# tracker wired up to actually start it.
+source="https://download.gnome.org/sources/gnome-user-share/47/gnome-user-share-$pkgver.tar.xz"
+sha256sums="1fac1bb8800dfa48ad9c3e19690f7e10e67a4f994d9cb17cae1d1bdffc9144ba  gnome-user-share-$pkgver.tar.xz"
+# makedepends matched against Alpine's real aports recipe
+# (community/gnome-user-share), minus cargo/clang-dev - Alpine is on
+# 48.3 which links a small Rust helper via cargo, the same unresolved
+# Rust CI vendoring blocker noted above for why we're pinned to 47.2.
+# apache2-dev/mod_dnssd are runtime-only there too (Alpine's own
+# makedepends doesn't list them, they're under depends= instead) -
+# -Dhttpd/-Dmodules_path are just path strings, nothing links against
+# httpd at build time.
+makedepends="glib-dev libselinux-dev"
+
+build() {
+    meson setup builddir \
+        --prefix=/overlayer/syshub \
+        --libdir=/overlayer/syshub/lib \
+        --includedir=/overlayer/syshub/include \
+        -Dsystemduserunitdir=/overlayer/syshub/lib/systemd/user \
+        -Dhttpd=/overlayer/syshub/sbin/httpd \
+        -Dmodules_path=/overlayer/syshub/lib/apache2 \
+        --strip
+    ninja -C builddir
+    DESTDIR="$(pwd)/_zexbuild-install" ninja -C builddir install
+}
+
+package() {
+    local inst="_zexbuild-install/overlayer/syshub"
+    mkdir -p "$PAYLOAD_DIR"
+    cp -a "$inst"/. "$PAYLOAD_DIR"/
+
+    # dav_user_2.4.conf hardcodes AuthGroupFile under /usr/share -
+    # -Dmodules_path only covers the apache module path, not this
+    # config template. substrate's own payload check rejects any
+    # /usr text reference regardless of source.
+    #
+    # gnome-user-share-webdav (a real ELF binary) also matched this
+    # grep - its RPATH or debug info apparently contains a literal
+    # "/usr/" substring, and grep -I doesn't reliably treat every ELF
+    # as binary. sed -i rewriting it changed its total byte length,
+    # shifting every offset after the match and leaving a corrupt ELF
+    # ("'.shstrtab section out of bounds'" from substrate's own patch
+    # step). Skip anything with the ELF magic explicitly - same check
+    # ci/build.sh's own verify_musl()/fix_interpreter() use.
+    grep -RIl '/usr/' "$PAYLOAD_DIR" 2>/dev/null | while IFS= read -r f; do
+        magic="$(od -An -tx1 -N4 "$f" 2>/dev/null | tr -d ' \n')"
+        [ "$magic" = "7f454c46" ] && continue
+        sed -i 's#/usr/#/overlayer/syshub/#g' "$f"
+    done
+}
