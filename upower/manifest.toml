@@ -1,0 +1,33 @@
+# manifest.toml - upower (syshub tier)
+
+[package]
+name             = "upower"
+version          = "1.91.3"
+description      = "D-Bus abstraction for enumerating power devices, querying history and statistics"
+license          = "GPL-2.0-or-later"
+maintainer       = "Ali Zain <alizain@zainiumdynamics.tech>"
+homepage         = "https://upower.freedesktop.org/"
+build_type       = "dynamic"
+libc_target      = "musl"
+
+blake3           = ""
+ed25519_sig      = ""
+ed25519_pubkey   = ""
+
+depends          = ["glib", "dbus", "libgudev", "polkit"]
+provides         = ["upower", "libupower-glib.so"]
+tags             = ["power", "battery", "dbus"]
+
+[install]
+bin     = "/overlayer/syshub/bin"
+lib     = "/overlayer/syshub/lib"
+libexec = "/overlayer/syshub/libexec"
+share   = "/overlayer/syshub/share"
+_syshub = true
+
+[remove]
+files    = []
+dirs     = []
+symlinks = []
+
+[hooks]

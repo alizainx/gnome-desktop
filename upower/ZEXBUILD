@@ -1,0 +1,48 @@
+maintainer="Ali Zain <alizain@zainiumdynamics.tech>"
+pkgname=upower
+pkgver=1.91.3
+pkgrel=0
+# sys-power/upower in Gentoo. Not GNOME-hosted - freedesktop.org gitlab
+# releases, tarball root is upower-v$pkgver (note the "v"), not
+# upower-$pkgver, so build() cds into it explicitly (ci/build.sh's
+# auto-cd only tries "$pkgname-$pkgver", which doesn't match here).
+#
+# Real gotcha found by reading meson.build directly, not the ebuild:
+# if -Dsystemdsystemunitdir is left at its default empty string,
+# meson.build calls dependency('systemd') with no required:false guard
+# at all - that's a hard configure failure with no libsystemd.pc
+# around (unlike dconf/mutter/gvfs, there's no libelogind fallback
+# here, systemd unit installation is the only consumer). Passing any
+# non-empty path sidesteps the dependency() call entirely - upower
+# itself has no other systemd/elogind touchpoint. No patch needed.
+source="https://gitlab.freedesktop.org/upower/upower/-/archive/v$pkgver/upower-v$pkgver.tar.bz2"
+sha256sums="12227b3dcd34c5097bbda25984b192ea0bd5e11dce479358d9ef70415a38e4b6  upower-v$pkgver.tar.bz2"
+makedepends="glib-dev dbus-dev libgudev-dev polkit-dev"
+
+# introspection off, same reasoning as every other recipe here.
+# -Dintrospection is a meson feature option here (enabled/disabled/
+# auto), not boolean - "false" errors with "not one of the choices".
+build() {
+    cd upower-v$pkgver
+
+    meson setup builddir \
+        --prefix=/overlayer/syshub \
+        --libdir=/overlayer/syshub/lib \
+        --includedir=/overlayer/syshub/include \
+        --localstatedir=/var \
+        -Dman=false \
+        -Dgtk-doc=false \
+        -Dintrospection=disabled \
+        -Dsystemdsystemunitdir=/overlayer/syshub/lib/systemd/system \
+        -Dos_backend=linux \
+        -Dpolkit=enabled \
+        -Didevice=disabled \
+        -Dinstalled_tests=false
+    ninja -C builddir
+    DESTDIR="$(pwd)/_zexbuild-install" ninja -C builddir install
+}
+
+package() {
+    local inst="_zexbuild-install/overlayer/syshub"
+    cp -a "$inst"/. "$PAYLOAD_DIR"/
+}
