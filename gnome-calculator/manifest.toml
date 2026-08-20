@@ -1,0 +1,32 @@
+# manifest.toml - gnome-calculator (syshub tier)
+
+[package]
+name             = "gnome-calculator"
+version          = "50.0"
+description      = "Calculator application for GNOME"
+license          = "GPL-3.0-or-later"
+maintainer       = "Ali Zain <alizain@zainiumdynamics.tech>"
+homepage         = "https://apps.gnome.org/Calculator/"
+build_type       = "dynamic"
+libc_target      = "musl"
+
+blake3           = ""
+ed25519_sig      = ""
+ed25519_pubkey   = ""
+
+depends          = ["glib", "libxml2", "libsoup3", "libgee", "mpc", "mpfr", "gtk4", "libadwaita", "gtksourceview5"]
+provides         = ["gnome-calculator"]
+tags             = ["gnome", "calculator", "app"]
+
+[install]
+bin     = "/overlayer/syshub/bin"
+lib     = "/overlayer/syshub/lib"
+share   = "/overlayer/syshub/share"
+_syshub = true
+
+[remove]
+files    = []
+dirs     = []
+symlinks = []
+
+[hooks]
