@@ -1,0 +1,32 @@
+# manifest.toml - polkit-gnome (syshub tier)
+
+[package]
+name             = "polkit-gnome"
+version          = "0.105"
+description      = "D-Bus session service that brings up PolicyKit authentication dialogs"
+license          = "LGPL-2.0"
+maintainer       = "Ali Zain <alizain@zainiumdynamics.tech>"
+homepage         = "https://gitlab.freedesktop.org/polkit/polkit/"
+build_type       = "dynamic"
+libc_target      = "musl"
+
+blake3           = ""
+ed25519_sig      = ""
+ed25519_pubkey   = ""
+
+depends          = ["glib", "polkit", "gtk3"]
+provides         = ["polkit-gnome-authentication-agent-1"]
+tags             = ["gnome", "polkit", "authentication"]
+
+[install]
+libexec = "/overlayer/syshub/libexec"
+share   = "/overlayer/syshub/share"
+etc     = "/overlayer/syshub/etc"
+_syshub = true
+
+[remove]
+files    = []
+dirs     = []
+symlinks = []
+
+[hooks]
